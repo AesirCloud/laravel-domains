@@ -1,0 +1,35 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # You can add more PHP versions here if you'd like
+        php: [ '8.3' ]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          coverage: xdebug
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Run tests (Pest)
+        run: |
+          ./vendor/bin/pest
