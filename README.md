@@ -5,6 +5,14 @@
 A Laravel package to scaffold Domain-Driven Design (DDD) structures in your Laravel projects. This package creates a complete suite of files—domain entities, value objects, repositories, domain services, models (with optional soft deletes), factories, observers, policies, and even migrations—so you can quickly get started with a DDD approach.
 
 ---
+
+<p align="center">
+<a href="https://github.com/aesircloud/laravel-domains/actions" target="_blank"><img src="https://img.shields.io/github/actions/workflow/status/aesircloud/laravel-domains/test.yml?branch=main&style=flat-square"/></a>
+<a href="https://packagist.org/packages/aesircloud/laravel-domains" target="_blank"><img src="https://img.shields.io/packagist/v/aesircloud/laravel-domains.svg?style=flat-square"/></a>
+<a href="https://packagist.org/packages/aesircloud/laravel-domains" target="_blank"><img src="https://img.shields.io/packagist/dt/aesircloud/laravel-domains.svg?style=flat-square"/></a>
+<a href="https://packagist.org/packages/aesircloud/laravel-domains" target="_blank"><img src="https://img.shields.io/packagist/l/aesircloud/laravel-domains.svg?style=flat-square"/></a>
+</p>
+
 ## FEATURES
 
 - **Domain Scaffolding**
