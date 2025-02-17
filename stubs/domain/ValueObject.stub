@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Domains\Generic\ValueObjects;
+
+class {{ name }}
+{
+    /**
+     * The underlying value.
+     *
+     * @var mixed
+     */
+    private $value;
+
+    /**
+     * Create a new value object.
+     *
+     * @param mixed $value
+     */
+    public function __construct($value): void
+    {
+        // Optionally, add validation or transformation logic here.
+        $this->value = $value;
+    }
+
+    /**
+     * Get the underlying value.
+     *
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Compare with another value object.
+     *
+     * @param  self  $other
+     * @return bool
+     */
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
+    }
+
+    /**
+     * Return the string representation of the value.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string) $this->value;
+    }
+}

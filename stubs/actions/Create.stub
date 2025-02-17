@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Actions\{{ domain }};
+
+use Lorisleiva\Actions\Concerns\AsAction;
+use App\Domains\{{ domain }}\Entities\{{ entity }};
+use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
+use App\DataTransferObjects\{{ domain }}Data;
+
+class Create{{ domain }}Action extends Action
+{
+    use AsAction;
+
+    /**
+     * Handle the action.
+     *
+     * @param  array<string, mixed>  $data
+     * @return {{ domain }}
+     */
+    public function handle(array $data): {{ domain }}
+    {
+        $dto = new {{ domain }}Data($data);
+
+        return (new {{ domain }}Service)->create($dto);
+    }
+
+    /**
+     * Handle the action as a job.
+     *
+     * @param  array<string, mixed>  $data
+     * @return void
+     */
+    public function asJob(array $data): void
+    {
+        $this->handle($data);
+    }
+}

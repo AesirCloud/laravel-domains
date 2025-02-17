@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Actions\{{ domain }};
+
+use Lorisleiva\Actions\Concerns\AsAction;
+use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
+
+class ForceDelete{{ domain }}Action
+{
+    use AsAction;
+
+    /**
+     * Handle the action.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    public function handle(string $id): void
+    {
+        (new {{ domain }}Service)->forceDelete($id);
+    }
+    
+    /**
+     * Handle the action as a job.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    public function asJob(string $id): void
+    {
+        $this->handle($id);
+    }
+}

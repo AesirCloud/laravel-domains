@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Actions\{{ domain }};
+
+use Lorisleiva\Actions\Concerns\AsAction;
+use App\Domains\{{ domain }}\Entities\{{ domain }};
+use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
+use App\DataTransferObjects\{{ domain }}Data;
+
+class Update{{ domain }}Action
+{
+    use AsAction;
+
+    /**
+     * Handle the action.
+     *
+     * @param  int  $id
+     * @param  array<string, mixed>  $data
+     * @return {{ domain }}
+     */
+    public function handle(string $id, array $data): {{ domain }}
+    {
+        $dto = new {{ domain }}Data($data);
+
+        return (new {{ domain }}Service)->update($id, $dto);
+    }
+    
+    /**
+     * Handle the action as a job.
+     *
+     * @param  int  $id
+     * @param  array<string, mixed>  $data
+     * @return void
+     */
+    public function asJob(string $id, array $data): void
+    {
+        $this->handle($id, $data);
+    }
+}

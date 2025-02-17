@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Observers;
+
+use App\Domains\{{ domain }}\Entities\{{ domain }};
+
+class {{ domain }}Observer
+{
+    /**
+     * Handle the creating event for the {{ domain }} model.
+     */
+    public function creating({{ domain }} ${{ domainLower }}): void
+    {
+        // ...
+    }
+
+    /**
+     * Handle the created event for the {{ domain }} model.
+     */
+    public function created({{ domain }} ${{ domainLower }}): void
+    {
+        // ...
+    }
+
+    /**
+     * Handle the updating event for the {{ domain }} model.
+     */
+    public function updating({{ domain }} ${{ domainLower }}): void
+    {
+        // ...
+    }
+
+    /**
+     * Handle the updated event for the {{ domain }} model.
+     */
+    public function updated({{ domain }} ${{ domainLower }}): void
+    {
+        // ...
+    }
+
+    /**
+     * Handle the deleting event for the {{ domain }} model.
+     */
+    public function deleting({{ domain }} ${{ domainLower }}): void
+    {
+        // ...
+    }
+
+    /**
+     * Handle the deleted event for the {{ domain }} model.
+     */
+    public function deleted({{ domain }} ${{ domainLower }}): void
+    {
+        // ...
+    }
+}

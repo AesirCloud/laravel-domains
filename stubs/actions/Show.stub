@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Actions\{{ domain }};
+
+use Lorisleiva\Actions\Concerns\AsAction;
+use App\Domains\{{ domain }}\Entities\{{ domain }};
+use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
+
+class Show{{ domain }}Action
+{
+    use AsAction;
+
+    /**
+     * Handle the action.
+     *
+     * @param  int  $id
+     * @return {{ domain }}|null
+     */
+    public function handle(string $id): ?{{ domain }}
+    {
+        return (new {{ domain }}Service)->show($id);
+    }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "aesircloud/laravel-domains",
+  "description": "A Laravel package for rapid domain driven development.",
+  "keywords": [
+    "AesirCloud",
+    "laravel",
+    "domain",
+    "domain driven design",
+    "laravel domains"
+  ],
+  "type": "library",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Greg Upton",
+        "email": "greg@aesircloud.com",
+        "homepage": "https://aesircloud.com",
+        "role": "Developer"
+      }
+    ],
+  "homepage": "https://github.com/AesirCloud/laravel-domains",
+  "autoload": {
+    "psr-4": {
+      "AesirCloud\\LaravelDomains\\": "src/",
+      "AesirCloud\\LaravelDomains\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "AesirCloud\\LaravelDomains\\Providers\\DomainServiceProvider"
+      ]
+    }
+  },
+  "require": {
+    "php": "^8.3",
+    "illuminate/console": "^11.42",
+    "illuminate/support": "^11.42.1",
+    "laravel/framework": "^11.42",
+    "spatie/laravel-data": "^4.13",
+    "lorisleiva/laravel-actions": "^2.8",
+    "spatie/laravel-sluggable": "^3.7"
+  },
+  "require-dev": {
+    "pestphp/pest": "^2.34",
+    "orchestra/testbench": "^9.10"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

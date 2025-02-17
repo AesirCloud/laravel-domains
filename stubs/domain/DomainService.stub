@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Domains\{{ domain }}\DomainServices;
+
+class {{ domain }}Service
+{
+    protected {{ domain }}Repository ${{ domainLower }}Repository;
+
+    /**
+     * Inject the repository dependency.
+     *
+     * @param {{ domain }}Repository ${{ domainLower }}Repository
+     */
+    public function __construct({{ domain }}Repository ${{ domainLower }}Repository)
+    {
+        $this->{{ domainLower }}Repository = ${{ domainLower }}Repository;
+    }
+
+    /**
+     * Execute the primary business operation for the {{ domain }} domain.
+     *
+     * @param mixed $input
+     * @return mixed
+     */
+    public function execute($input)
+    {
+        // TODO: Implement business logic for the {{ domain }} domain.
+        // For example, process the $input and return the result.
+    }
+}

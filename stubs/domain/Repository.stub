@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Domains\{{ domain }}\Repositories;
+
+use App\Domains\{{ domain }}\Entities\{{ domain }} as Domain{{ domain }};
+use Illuminate\Support\Collection;
+
+interface {{ domain }}RepositoryInterface
+{
+    /**
+     * Get all {{ domain }} entities.
+     *
+     * @return Collection<int, Domain{{ domain }}>
+     */
+    public function all(): Collection;
+
+    /**
+     * Find a {{ domain }} entity by UUID or return null.
+     *
+     * @param  string  $id
+     * @return Domain{{ domain }}|null
+     */
+    public function find(string $id): ?Domain{{ domain }};
+
+    /**
+     * Find a {{ domain }} entity by UUID or fail.
+     *
+     * @param  string  $id
+     * @return Domain{{ domain }}
+     */
+    public function findOrFail(string $id): Domain{{ domain }};
+
+    /**
+     * Find a {{ domain }} entity by a given column and value or return null.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @return Domain{{ domain }}|null
+     */
+    public function findBy(string $column, mixed $value): ?Domain{{ domain }};
+
+    /**
+     * Update an existing record or create a new one if none exists.
+     *
+     * @param  array<string, mixed>  $search
+     * @param  array<string, mixed>  $additional
+     * @return Domain{{ domain }}
+     */
+    public function updateOrCreate(array $search, array $additional = []): Domain{{ domain }};
+
+    /**
+     * Create a new {{ domain }} entity from given data.
+     *
+     * @param  array<string, mixed>  $data
+     * @return Domain{{ domain }}
+     */
+    public function create(array $data): Domain{{ domain }};
+
+    /**
+     * Update an existing {{ domain }} entity by UUID with given data.
+     *
+     * @param  string  $id
+     * @param  array<string, mixed>  $data
+     * @return Domain{{ domain }}|null
+     */
+    public function update(string $id, array $data): ?Domain{{ domain }};
+
+    /**
+     * Delete a {{ domain }} entity by UUID.
+     *
+     * @param  string  $id
+     * @return bool  True if deleted, otherwise false.
+     */
+    public function delete(string $id): bool;
+}

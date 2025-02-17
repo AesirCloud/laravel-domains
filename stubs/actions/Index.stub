@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Actions\{{ domain }};
+
+use Lorisleiva\Actions\Concerns\AsAction;
+use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
+
+class Index{{ domain }}Action
+{
+    use AsAction;
+
+    /**
+     * Handle the action.
+     *
+     * @return array<int, {{ domain }}>
+     */
+    public function handle(): array
+    {
+        return (new {{ domain }}Service)->index();
+    }
+}

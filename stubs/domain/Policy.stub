@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\User;
+use App\Domains\{{ domain }}\Entities\{{ domain }};
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class {{ domain }}Policy
+{
+    use HandlesAuthorization;
+
+    /**
+     * Determine whether the user can view any {{ domain }} models.
+     */
+    public function viewAny(User $user): bool
+    {
+        // Example permission check.
+        return $user->can('{{ domainLower }}.viewAny');
+    }
+
+    /**
+     * Determine whether the user can view a specific {{ domain }} model.
+     */
+    public function view(User $user, {{ domain }} ${{ domainLower }}): bool
+    {
+        // Example: Must have permission or own the resource.
+        return $user->can('{{ domainLower }}.view')
+            || $user->id === ${{ domainLower }}->user_id;
+    }
+
+    /**
+     * Determine whether the user can create a new {{ domain }} model.
+     */
+    public function create(User $user): bool
+    {
+        return $user->can('{{ domainLower }}.create');
+    }
+
+    /**
+     * Determine whether the user can update a {{ domain }} model.
+     */
+    public function update(User $user, {{ domain }} ${{ domainLower }}): bool
+    {
+        return $user->can('{{ domainLower }}.update')
+            || $user->id === ${{ domainLower }}->user_id;
+    }
+
+    /**
+     * Determine whether the user can delete a {{ domain }} model.
+     */
+    public function delete(User $user, {{ domain }} ${{ domainLower }}): bool
+    {
+        return $user->can('{{ domainLower }}.delete')
+            || $user->id === ${{ domainLower }}->user_id;
+    }
+}

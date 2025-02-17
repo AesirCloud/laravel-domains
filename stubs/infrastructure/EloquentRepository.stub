@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Infrastructure\Persistence\Repositories;
+
+use App\Domains\{{ domain }}\Repositories\{{ domain }}RepositoryInterface;
+use App\Domains\{{ domain }}\Entities\{{ domain }} as Domain{{ domain }};
+use App\Models\{{ domain }} as Eloquent{{ domain }};
+use Illuminate\Support\Collection;
+
+class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
+{
+    /**
+     * Return all {{ domain }} entities.
+     *
+     * @return Collection<int, Domain{{ domain }}>
+     */
+    public function all(): Collection
+    {
+        return Eloquent{{ domain }}::all()
+            ->map(fn (Eloquent{{ domain }} $model) => $this->toDomain($model));
+    }
+
+    /**
+     * Find a {{ domain }} entity by UUID.
+     *
+     * @param  string  $id
+     * @return Domain{{ domain }}|null
+     */
+    public function find(string $id): ?Domain{{ domain }}
+    {
+        $model = Eloquent{{ domain }}::find($id);
+
+        return $model ? $this->toDomain($model) : null;
+    }
+
+    /**
+     * Find a {{ domain }} entity by UUID or fail.
+     *
+     * @param  string  $id
+     * @return Domain{{ domain }}
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail(string $id): Domain{{ domain }}
+    {
+        $model = Eloquent{{ domain }}::findOrFail($id);
+
+        return $this->toDomain($model);
+    }
+
+    /**
+     * Find a {{ domain }} entity by a given column and value.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @return Domain{{ domain }}|null
+     */
+    public function findBy(string $column, mixed $value): ?Domain{{ domain }}
+    {
+        $model = Eloquent{{ domain }}::where($column, $value)->first();
+
+        return $model ? $this->toDomain($model) : null;
+    }
+
+    /**
+     * Update an existing record or create a new one if none exists.
+     *
+     * @param  array<string, mixed>  $search
+     * @param  array<string, mixed>  $additional
+     * @return Domain{{ domain }}
+     */
+    public function updateOrCreate(array $search, array $additional = []): Domain{{ domain }}
+    {
+        $model = Eloquent{{ domain }}::updateOrCreate($search, $additional);
+
+        return $this->toDomain($model);
+    }
+
+    /**
+     * Create a new {{ domain }} entity from given data.
+     *
+     * @param  array<string, mixed>  $data
+     * @return Domain{{ domain }}
+     */
+    public function create(array $data): Domain{{ domain }}
+    {
+        $model = Eloquent{{ domain }}::create($data);
+
+        return $this->toDomain($model);
+    }
+
+    /**
+     * Update an existing {{ domain }} entity by UUID with given data.
+     *
+     * @param  string  $id
+     * @param  array<string, mixed>  $data
+     * @return Domain{{ domain }}|null
+     */
+    public function update(string $id, array $data): ?Domain{{ domain }}
+    {
+        $model = Eloquent{{ domain }}::find($id);
+
+        if (!$model) {
+            return null;
+        }
+
+        $model->update($data);
+
+        return $this->toDomain($model);
+    }
+
+    /**
+     * Delete a {{ domain }} entity by UUID.
+     *
+     * @param  string  $id
+     * @return bool  True if deleted, otherwise false.
+     */
+    public function delete(string $id): bool
+    {
+        $model = Eloquent{{ domain }}::find($id);
+
+        if (!$model) {
+            return false;
+        }
+
+        return (bool) $model->delete();
+    }
+
+    /**
+     * Convert an Eloquent model to a domain entity.
+     *
+     * @param  Eloquent{{ domain }}  $model
+     * @return Domain{{ domain }}
+     */
+    protected function toDomain(Eloquent{{ domain }} $model): Domain{{ domain }}
+    {
+        // Map Eloquent model fields to domain entity constructor.
+        // Adjust as needed for your domain entity's fields.
+        return new Domain{{ domain }}(
+            $model->id,
+            $model->name,
+            $model->slug
+        );
+    }
+}
