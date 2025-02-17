@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use AesirCloud\Sluggable\Traits\Sluggable;
 use App\Models\BaseModel;
 use App\Observers\{{ entity }}Observer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
 
 #[ObservedBy({{ entity }}Observer::class)]
 class {{ domain }} extends BaseModel
 {
     use HasFactory;
-    use HasSlug;
+    use Sluggable;
 
     /**
      * The attributes that are not mass assignable.
@@ -35,16 +34,6 @@ class {{ domain }} extends BaseModel
         return [
             //
         ];
-    }
-
-    /**
-     * Get the options for generating the slug.
-     */
-    public function getSlugOptions() : SlugOptions
-    {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
     }
 
     /**

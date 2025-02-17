@@ -162,7 +162,7 @@ php artisan make:value-object Address --domain=User --force
 - illuminate/console: 11.42 or higher
 - illuminate/support: 11.42.1 or higher
 - spatie/laravel-data: 4.13 or higher
-- spatie/laravel-sluggable: 3.7.2 or higher
+- aesircloud/sluggable: 1.1.0 or higher
 - lorisleiva/laravel-actions: 2.8.6 or higher
 
 ## DESIGN AND DEVELOPMENT STANDARDS

@@ -39,7 +39,7 @@
     "laravel/framework": "^11.42",
     "spatie/laravel-data": "^4.13",
     "lorisleiva/laravel-actions": "^2.8",
-    "spatie/laravel-sluggable": "^3.7"
+    "aesircloud/sluggable": "^1.1"
   },
   "require-dev": {
     "pestphp/pest": "^2.34",
