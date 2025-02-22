@@ -200,7 +200,7 @@ class MakeDomainCommand extends Command
             ? __DIR__ . "/../../stubs/infrastructure/EloquentRepository.soft.stub"
             : __DIR__ . "/../../stubs/infrastructure/EloquentRepository.stub";
 
-        $concreteRepoDestination = $concreteRepoDir . "/Eloquent{$domainName}Repository.php";
+        $concreteRepoDestination = $concreteRepoDir . "/{$domainName}Repository.php";
 
         if (File::exists($concreteRepoStubFile)) {
             $contents = File::get($concreteRepoStubFile);
@@ -251,7 +251,7 @@ class MakeDomainCommand extends Command
             if (strpos($providerContent, $bindingSignature) === false) {
                 $bindingLine = "\n        \$this->app->bind(\n"
                     . "            \\App\\Domains\\{$domainName}\\Repositories\\{$domainName}RepositoryInterface::class,\n"
-                    . "            \\App\\Infrastructure\\Persistence\\Repositories\\Eloquent{$domainName}Repository::class\n"
+                    . "            \\App\\Infrastructure\\Persistence\\Repositories\\{$domainName}Repository::class\n"
                     . "        );";
 
                 // Regex to capture an optional return type (e.g. : void)
