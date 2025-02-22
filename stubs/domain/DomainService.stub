@@ -2,6 +2,8 @@
 
 namespace App\Domains\{{ domain }}\DomainServices;
 
+use App\Infrastructure\Persistence\Repositories\{{ domain }}Repository;
+
 class {{ domain }}Service
 {
     protected {{ domain }}Repository ${{ domainLower }}Repository;

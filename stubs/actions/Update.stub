@@ -5,7 +5,7 @@ namespace App\Actions\{{ domain }};
 use Lorisleiva\Actions\Concerns\AsAction;
 use App\Domains\{{ domain }}\Entities\{{ domain }};
 use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
-use App\DataTransferObjects\{{ domain }}Data;
+use App\Domains\{{ domain }}\DataTransferObjects\{{ domain }}Data;
 
 class Update{{ domain }}Action
 {
@@ -14,21 +14,21 @@ class Update{{ domain }}Action
     /**
      * Handle the action.
      *
-     * @param  int  $id
+     * @param  string  $id
      * @param  array<string, mixed>  $data
      * @return {{ domain }}
      */
     public function handle(string $id, array $data): {{ domain }}
     {
-        $dto = new {{ domain }}Data($data);
+        $dto = {{ domain }}Data::validate($data);
 
-        return (new {{ domain }}Service)->update($id, $dto);
+        return app({{ domain }}Service::class)->update($id, $dto);
     }
-    
+
     /**
      * Handle the action as a job.
      *
-     * @param  int  $id
+     * @param  string  $id
      * @param  array<string, mixed>  $data
      * @return void
      */

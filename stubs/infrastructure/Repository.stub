@@ -7,7 +7,7 @@ use App\Domains\{{ domain }}\Entities\{{ domain }} as Domain{{ domain }};
 use App\Models\{{ domain }} as Eloquent{{ domain }};
 use Illuminate\Support\Collection;
 
-class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
+class {{ domain }}Repository implements {{ domain }}RepositoryInterface
 {
     /**
      * Return all {{ domain }} entities.

@@ -3,43 +3,43 @@
 namespace App\Infrastructure\Persistence\Repositories;
 
 use App\Domains\{{ domain }}\Repositories\{{ domain }}RepositoryInterface;
-use App\Domains\{{ domain }}\Entities\{{ domain }} as Domain{{ domain }};
-use App\Models\{{ domain }} as Eloquent{{ domain }};
+use App\Domains\{{ domain }}\Entities\{{ domain }} as {{ domain }}Entity;
+use App\Models\{{ domain }};
 use Illuminate\Support\Collection;
 
-class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
+class {{ domain }}Repository implements {{ domain }}RepositoryInterface
 {
     /**
      * Return all non-deleted {{ domain }} entities.
      *
-     * @return Collection<int, Domain{{ domain }}>
+     * @return Collection<int, {{ domain }}Entity>
      */
     public function all(): Collection
     {
-        return Eloquent{{ domain }}::all()
-            ->map(fn (Eloquent{{ domain }} $model) => $this->toDomain($model));
+        return {{ domain }}::all()
+            ->map(fn ({{ domain }} $model) => $this->toDomain($model));
     }
 
     /**
      * Return all {{ domain }} entities, including trashed ones.
      *
-     * @return Collection<int, Domain{{ domain }}>
+     * @return Collection<int, {{ domain }}Entity>
      */
     public function allWithTrashed(): Collection
     {
-        return Eloquent{{ domain }}::withTrashed()->get()
-            ->map(fn (Eloquent{{ domain }} $model) => $this->toDomain($model));
+        return {{ domain }}::withTrashed()->get()
+            ->map(fn ({{ domain }} $model) => $this->toDomain($model));
     }
 
     /**
      * Find a {{ domain }} entity by UUID (including trashed).
      *
      * @param  string  $id
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}Entity|null
      */
-    public function find(string $id): ?Domain{{ domain }}
+    public function find(string $id): ?{{ domain }}Entity
     {
-        $model = Eloquent{{ domain }}::withTrashed()->find($id);
+        $model = {{ domain }}::withTrashed()->find($id);
 
         return $model ? $this->toDomain($model) : null;
     }
@@ -48,13 +48,13 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      * Find a {{ domain }} entity by UUID or fail (including trashed).
      *
      * @param  string  $id
-     * @return Domain{{ domain }}
+     * @return {{ domain }}Entity
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findOrFail(string $id): Domain{{ domain }}
+    public function findOrFail(string $id): {{ domain }}Entity
     {
-        $model = Eloquent{{ domain }}::withTrashed()->findOrFail($id);
+        $model = {{ domain }}::withTrashed()->findOrFail($id);
 
         return $this->toDomain($model);
     }
@@ -64,11 +64,11 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      *
      * @param  string  $column
      * @param  mixed   $value
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}Entity|null
      */
-    public function findBy(string $column, mixed $value): ?Domain{{ domain }}
+    public function findBy(string $column, mixed $value): ?{{ domain }}Entity
     {
-        $model = Eloquent{{ domain }}::withTrashed()
+        $model = {{ domain }}::withTrashed()
             ->where($column, $value)
             ->first();
 
@@ -80,12 +80,12 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      *
      * @param  array<string, mixed>  $search
      * @param  array<string, mixed>  $additional
-     * @return Domain{{ domain }}
+     * @return {{ domain }}Entity
      */
-    public function updateOrCreate(array $search, array $additional = []): Domain{{ domain }}
+    public function updateOrCreate(array $search, array $additional = []): {{ domain }}Entity
     {
         // Using withTrashed() ensures we don't accidentally create a new row if a soft-deleted record exists.
-        $model = Eloquent{{ domain }}::withTrashed()
+        $model = {{ domain }}::withTrashed()
             ->updateOrCreate($search, $additional);
 
         return $this->toDomain($model);
@@ -95,11 +95,11 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      * Create a new {{ domain }} entity from given data.
      *
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}
+     * @return {{ domain }}Entity
      */
-    public function create(array $data): Domain{{ domain }}
+    public function create(array $data): {{ domain }}Entity
     {
-        $model = Eloquent{{ domain }}::create($data);
+        $model = {{ domain }}::create($data);
 
         return $this->toDomain($model);
     }
@@ -109,11 +109,11 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      *
      * @param  string  $id
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}Entity|null
      */
-    public function update(string $id, array $data): ?Domain{{ domain }}
+    public function update(string $id, array $data): ?{{ domain }}Entity
     {
-        $model = Eloquent{{ domain }}::withTrashed()->find($id);
+        $model = {{ domain }}::withTrashed()->find($id);
 
         if (!$model) {
             return null;
@@ -132,7 +132,7 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      */
     public function delete(string $id): bool
     {
-        $model = Eloquent{{ domain }}::withTrashed()->find($id);
+        $model = {{ domain }}::withTrashed()->find($id);
 
         if (!$model || $model->trashed()) {
             return false;
@@ -149,7 +149,7 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      */
     public function restore(string $id): bool
     {
-        $model = Eloquent{{ domain }}::withTrashed()->find($id);
+        $model = {{ domain }}::withTrashed()->find($id);
 
         if (!$model || !$model->trashed()) {
             return false;
@@ -166,7 +166,7 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
      */
     public function forceDelete(string $id): bool
     {
-        $model = Eloquent{{ domain }}::withTrashed()->find($id);
+        $model = {{ domain }}::withTrashed()->find($id);
 
         if (!$model) {
             return false;
@@ -178,12 +178,12 @@ class Eloquent{{ domain }}Repository implements {{ domain }}RepositoryInterface
     /**
      * Convert an Eloquent model to a domain entity.
      *
-     * @param  Eloquent{{ domain }}  $model
-     * @return Domain{{ domain }}
+     * @param  {{ domain }}  $model
+     * @return {{ domain }}Entity
      */
-    protected function toDomain(Eloquent{{ domain }} $model): Domain{{ domain }}
+    protected function toDomain({{ domain }} $model): {{ domain }}Entity
     {
-        return new Domain{{ domain }}(
+        return new {{ domain }}Entity(
             $model->id,
             $model->name,
             $model->slug

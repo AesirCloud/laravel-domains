@@ -17,7 +17,7 @@ class Restore{{ domain }}Action
      */
     public function handle(string $id): void
     {
-        (new {{ domain }}Service)->restore($id);
+        app({{ domain }}Service::class)->restore($id);
     }
     
     /**

@@ -3,11 +3,11 @@
 namespace App\Actions\{{ domain }};
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use App\Domains\{{ domain }}\Entities\{{ entity }};
+use App\Domains\{{ domain }}\Entities\{{ domain }};
 use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
-use App\DataTransferObjects\{{ domain }}Data;
+use App\Domains\{{ domain }}\DataTransferObjects\{{ domain }}Data;
 
-class Create{{ domain }}Action extends Action
+class Create{{ domain }}Action
 {
     use AsAction;
 
@@ -19,9 +19,9 @@ class Create{{ domain }}Action extends Action
      */
     public function handle(array $data): {{ domain }}
     {
-        $dto = new {{ domain }}Data($data);
+        $dto = {{ domain }}Data::validate($data);
 
-        return (new {{ domain }}Service)->create($dto);
+        return app({{ domain }}Service::class)->create($dto);
     }
 
     /**
