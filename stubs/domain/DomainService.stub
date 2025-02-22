@@ -22,7 +22,7 @@ class {{ domain }}Service
      * @param mixed $input
      * @return mixed
      */
-    public function execute($input)
+    public function execute(mixed $input): mixed
     {
         // TODO: Implement business logic for the {{ domain }} domain.
         // For example, process the $input and return the result.
