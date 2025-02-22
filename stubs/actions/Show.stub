@@ -13,11 +13,11 @@ class Show{{ domain }}Action
     /**
      * Handle the action.
      *
-     * @param  int  $id
+     * @param  string  $id
      * @return {{ domain }}|null
      */
     public function handle(string $id): ?{{ domain }}
     {
-        return (new {{ domain }}Service)->show($id);
+        return app({{ domain }}Service::class)->show($id);
     }
 }

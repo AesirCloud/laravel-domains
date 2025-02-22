@@ -4,6 +4,7 @@ namespace App\Actions\{{ domain }};
 
 use Lorisleiva\Actions\Concerns\AsAction;
 use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
+use App\Domains\{{ domain }}\Entities\{{ domain }};
 
 class Index{{ domain }}Action
 {
@@ -16,6 +17,6 @@ class Index{{ domain }}Action
      */
     public function handle(): array
     {
-        return (new {{ domain }}Service)->index();
+        return app({{ domain }}Service::class)->index();
     }
 }

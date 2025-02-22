@@ -17,7 +17,7 @@ class ForceDelete{{ domain }}Action
      */
     public function handle(string $id): void
     {
-        (new {{ domain }}Service)->forceDelete($id);
+        app({{ domain }}Service::class)->forceDelete($id);
     }
     
     /**
