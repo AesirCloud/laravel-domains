@@ -4,15 +4,15 @@ namespace App\Models;
 
 use AesirCloud\Sluggable\Traits\Sluggable;
 use App\Models\BaseModel;
-use App\Observers\{{ entity }}Observer;
+use App\Observers\{{ domain }}Observer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[ObservedBy({{ entity }}Observer::class)]
+#[ObservedBy({{ domain }}Observer::class)]
 class {{ domain }} extends BaseModel
 {
     use HasFactory;
-    use HasSlug;
+    use Sluggable;
     use SoftDeletes;
 
     /**

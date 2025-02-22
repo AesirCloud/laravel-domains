@@ -1,7 +1,10 @@
 # Change Log
 All notable changes to `laravel-domains` will be documented in this file.
 
-## 0.2.1 - 2025-02-22
+## 0.2.3 - 2025-02-22
+
+
+## 0.2.2 - 2025-02-22
 - **FIXED** Updated the MakeDomainCommand to generate singular class names (e.g., User) while preserving plural table names (e.g., users). This aligns with typical Laravel conventions, ensuring that running php artisan make:domain Users will create a User.php model, but generate a users table in the migration.
 
 ## 0.2.1 - 2025-02-17

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\{{ domain }}\DTOs;
+namespace App\Domains\{{ domain }}\DataTransferObjects;
 
 use Spatie\LaravelData\Data;
 

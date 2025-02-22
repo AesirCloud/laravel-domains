@@ -25,8 +25,11 @@ class MakeDomainCommand extends Command
         // For class names, use singular (e.g., "Users" -> "User")
         $domainName = Str::studly(Str::singular($rawName));
 
-        // For table names, we keep it plural and snake (e.g., "Users" -> "users")
+        // For table names, keep it plural and snake (e.g., "Users" -> "users")
         $tableName = Str::snake(Str::plural($rawName));
+
+        // For variable names (e.g. $user, $customer)
+        $domainLower = Str::camel($domainName);
 
         $softDeletes     = $this->option('soft-deletes');
         $createMigration = $this->option('migration');
@@ -65,10 +68,14 @@ class MakeDomainCommand extends Command
 
         foreach ($domainStubs as $stub => $destination) {
             $stubFilePath = $stubPath . '/' . $stub;
+
             if (File::exists($stubFilePath)) {
                 $contents = File::get($stubFilePath);
-                // Replace {{ domain }} placeholder with the singular, studly name
-                $contents = str_replace('{{ domain }}', $domainName, $contents);
+                $contents = str_replace(
+                    ['{{ domain }}', '{{ domainLower }}'],
+                    [$domainName, $domainLower],
+                    $contents
+                );
                 $this->createFile($destination, $contents);
             } else {
                 $this->warn("Stub file not found: {$stubFilePath}");
@@ -80,7 +87,11 @@ class MakeDomainCommand extends Command
         $dtoDestination = "{$baseDir}/DataTransferObjects/{$domainName}Data.php";
         if (File::exists($dtoStubPath)) {
             $contents = File::get($dtoStubPath);
-            $contents = str_replace('{{ domain }}', $domainName, $contents);
+            $contents = str_replace(
+                ['{{ domain }}', '{{ domainLower }}'],
+                [$domainName, $domainLower],
+                $contents
+            );
             $this->createFile($dtoDestination, $contents);
         } else {
             $this->warn("DTO stub not found: {$dtoStubPath}");
@@ -104,8 +115,12 @@ class MakeDomainCommand extends Command
 
         if (File::exists($modelStubPath)) {
             $contents = File::get($modelStubPath);
-            // Replace placeholders with the singular class name and plural table name
-            $contents = str_replace(['{{ domain }}', '{{ table }}'], [$domainName, $tableName], $contents);
+            // Replace placeholders with the singular class name, variable name, and plural table name
+            $contents = str_replace(
+                ['{{ domain }}', '{{ domainLower }}', '{{ table }}'],
+                [$domainName, $domainLower, $tableName],
+                $contents
+            );
             $this->createFile($modelDestination, $contents);
         } else {
             $this->warn("Model stub not found: {$modelStubPath}");
@@ -118,7 +133,11 @@ class MakeDomainCommand extends Command
 
         if (File::exists($factoryStubPath)) {
             $contents = File::get($factoryStubPath);
-            $contents = str_replace('{{ domain }}', $domainName, $contents);
+            $contents = str_replace(
+                ['{{ domain }}', '{{ domainLower }}'],
+                [$domainName, $domainLower],
+                $contents
+            );
             $this->createFile($factoryDestination, $contents);
         } else {
             $this->warn("Factory stub not found: {$factoryStubPath}");
@@ -137,7 +156,11 @@ class MakeDomainCommand extends Command
 
         if (File::exists($observerStubPath)) {
             $contents = File::get($observerStubPath);
-            $contents = str_replace('{{ domain }}', $domainName, $contents);
+            $contents = str_replace(
+                ['{{ domain }}', '{{ domainLower }}'],
+                [$domainName, $domainLower],
+                $contents
+            );
             $this->createFile($observerDestination, $contents);
         } else {
             $this->warn("Observer stub not found: {$observerStubPath}");
@@ -156,7 +179,11 @@ class MakeDomainCommand extends Command
 
         if (File::exists($policyStubPath)) {
             $contents = File::get($policyStubPath);
-            $contents = str_replace('{{ domain }}', $domainName, $contents);
+            $contents = str_replace(
+                ['{{ domain }}', '{{ domainLower }}'],
+                [$domainName, $domainLower],
+                $contents
+            );
             $this->createFile($policyDestination, $contents);
         } else {
             $this->warn("Policy stub not found: {$policyStubPath}");
@@ -177,7 +204,11 @@ class MakeDomainCommand extends Command
 
         if (File::exists($concreteRepoStubFile)) {
             $contents = File::get($concreteRepoStubFile);
-            $contents = str_replace('{{ domain }}', $domainName, $contents);
+            $contents = str_replace(
+                ['{{ domain }}', '{{ domainLower }}'],
+                [$domainName, $domainLower],
+                $contents
+            );
             $this->createFile($concreteRepoDestination, $contents);
         } else {
             $this->warn("Concrete repository stub not found: {$concreteRepoStubFile}");
@@ -194,7 +225,11 @@ class MakeDomainCommand extends Command
 
             if (File::exists($migrationStubPath)) {
                 $contents = File::get($migrationStubPath);
-                $contents = str_replace(['{{ domain }}', '{{ table }}'], [$domainName, $tableName], $contents);
+                $contents = str_replace(
+                    ['{{ domain }}', '{{ domainLower }}', '{{ table }}'],
+                    [$domainName, $domainLower, $tableName],
+                    $contents
+                );
                 $this->createFile($migrationDestination, $contents);
             } else {
                 $this->warn("Migration stub not found: {$migrationStubPath}");
@@ -264,7 +299,11 @@ class MakeDomainCommand extends Command
 
             if (File::exists($stubFilePath)) {
                 $contents = File::get($stubFilePath);
-                $contents = str_replace('{{ domain }}', $domainName, $contents);
+                $contents = str_replace(
+                    ['{{ domain }}', '{{ domainLower }}'],
+                    [$domainName, $domainLower],
+                    $contents
+                );
                 $this->createFile($destPath, $contents);
             } else {
                 $this->warn("Action stub not found: {$stubFilePath}");
@@ -279,8 +318,8 @@ class MakeDomainCommand extends Command
     /**
      * Create or replace a file with given contents, respecting --force.
      *
-     * @param string $destination
-     * @param string $contents
+     * @param  string  $destination
+     * @param  string  $contents
      * @return void
      */
     protected function createFile($destination, $contents)
