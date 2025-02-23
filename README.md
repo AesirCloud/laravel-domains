@@ -131,6 +131,28 @@ php artisan make:domain {DomainName} [--migration] [--soft-deletes] [--force]
 - Update the RepositoryServiceProvider with the binding for the new domain’s repository interface and its concrete implementation.
 - Generate CRUD actions (Create, Update, Delete, Index, Show), with optional Restore and ForceDelete actions if soft deletes are enabled.
 
+### MAKING A SUBDOMAIN
+
+To create a subdomain within an existing domain, use the `make:subdomain` command:
+
+```php
+php artisan make:subdomain {ParentDomain} {SubdomainName} [--migration] [--soft-deletes] [--force]
+```
+
+#### EXAMPLES
+
+Example: Under the 'User' domain, create a 'AuthenticationLogs' subdomain
+```php
+php artisan make:subdomain User AuthenticationLogs --migration --soft-deletes
+```
+
+- Also creates actions in app/Actions/{ParentDomain}/{SubdomainName}, e.g. app/Actions/User/AuthenticationLogs/DeleteAuthenticationLogAction.php.
+- Binds the repository to RepositoryServiceProvider.
+
+***NOTE:*** The parent domain (e.g. app/Domains/User) must already exist before you can add a subdomain within it.
+- You can make a folder in the `app/Domains/<domain>` directory to represent a parent domain that you do not need to scaffold. E.g., `app/Domains/HumanResources`. Then you can create subdomains within that folder.
+- **Example:** `php artisan make:subdomain HumanResources Payroll --migration --soft-deletes`
+
 ### MAKING A VALUE OBJECT
 
 You can also generate a value object, optionally scoping it to a domain:
@@ -147,12 +169,16 @@ Or specify a domain:
 php artisan make:value-object Address --domain=User
 ```
 
-Creates `app/Domains/User/ValueObjects/AddressValueObject.php`.
-
-You can also use `--force` to overwrite existing files:
+Or specify a domain and subdomain:
 
 ```php
-php artisan make:value-object Address --domain=User --force
+php and artisan make:value-object Check --domain=HumanResources --sub-domain=Payroll 
+```
+
+You can also use the `--force` option to overwrite existing files:
+
+```php
+php artisan make:value-object Address --force
 ```
 
 ## REQUIREMENTS

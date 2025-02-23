@@ -1,71 +1,33 @@
 <?php
 
-namespace App\Domains\{{ domain }}\Entities;
+namespace {{ domainNamespace }}\Entities;
 
 class {{ domain }}
 {
     /**
      * The unique identifier of the {{ domain }}.
-     *
-     * @var string
      */
     protected string $id;
 
     /**
      * The name of the {{ domain }}.
-     *
-     * @var string
      */
     protected string $name;
 
     /**
      * The slug of the {{ domain }}.
-     *
-     * @var string
      */
     protected string $slug;
 
     /**
      * Create a new {{ domain }} entity.
-     *
-     * @param string $id
-     * @param string $name
-     * @param string $slug
      */
     public function __construct(string $id, string $name, string $slug)
     {
-        $this->id = $id;
+        $this->id   = $id;
         $this->name = $name;
         $this->slug = $slug;
     }
 
-    /**
-     * Get the ID of the {{ domain }}.
-     *
-     * @return string
-     */
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the name of the {{ domain }}.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the slug of the {{ domain }}.
-     *
-     * @return string
-     */
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
+    // Getters, etc.
 }

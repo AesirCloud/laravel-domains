@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domains\{{ domain }}\Repositories;
+namespace {{ domainNamespace }}\Repositories;
 
-use App\Domains\{{ domain }}\Entities\{{ domain }} as Domain{{ domain }};
+use {{ domainNamespace }}\Entities\{{ domain }};
 use Illuminate\Support\Collection;
 
 interface {{ domain }}RepositoryInterface
