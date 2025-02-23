@@ -3,7 +3,7 @@ All notable changes to `aesircloud/laravel-domains` will be documented in this f
 
 ---
 
-## 0.2.6 - 2025-02-23
+## 1.0.0 - 2025-02-23
 - **ENHANCEMENT:** Added `make:subdomain` command to add subdomains to a domain.
 
 ## 0.2.2-0.2.5 - 2025-02-22
