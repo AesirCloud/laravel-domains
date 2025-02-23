@@ -10,8 +10,8 @@ use Illuminate\Support\Str;
 class MakeSubdomainCommand extends Command
 {
     protected $signature = 'make:subdomain
-                            {parent : The existing parent domain (e.g. User)}
-                            {name : The subdomain (e.g. AuthenticationLogs)}
+                            {parent : The existing (plural) parent domain, e.g. "Users"}
+                            {name : The subdomain (plural) e.g. "Profiles"}
                             {--migration : Create a migration file}
                             {--soft-deletes : Include soft deletes functionality}
                             {--force : Overwrite any existing files without prompting}';
@@ -20,35 +20,40 @@ class MakeSubdomainCommand extends Command
 
     public function handle(): int
     {
-        $parentRaw    = $this->argument('parent');
-        $subdomainRaw = $this->argument('name');
+        // e.g. parentRaw="Users", subdomainRaw="Profiles"
+        $parentRaw     = $this->argument('parent');
+        $subdomainRaw  = $this->argument('name');
 
-        // preserve exactly
-        $parentDomain  = $parentRaw;
-        $subdomainName = $subdomainRaw;
-        $subdomainLower = Str::camel($subdomainName);
+        // Directories remain plural
+        $parentDirName    = Str::studly($parentRaw);    // e.g. "Users"
+        $parentClassName  = Str::singular($parentDirName);  // "User"
 
-        $domainNamespace  = "App\\Domains\\{$parentDomain}\\{$subdomainName}";
-        $actionsNamespace = "App\\Actions\\{$parentDomain}\\{$subdomainName}";
+        $subdomainDirName = Str::studly($subdomainRaw); // "Profiles"
+        $subdomainClassName = Str::singular($subdomainDirName); // "Profile"
 
-        $tableName = Str::snake(Str::plural($subdomainRaw));
+        // e.g. "app/Domains/Users/Profiles"
+        $domainNamespace  = "App\\Domains\\{$parentDirName}\\{$subdomainDirName}";
+        $actionsNamespace = "App\\Actions\\{$parentDirName}\\{$subdomainDirName}";
+
+        // DB table => from subdomain singular => "profiles" if subdomainClassName="Profile"
+        $tableName = Str::snake(Str::plural($subdomainClassName));
 
         $softDeletes     = $this->option('soft-deletes');
         $createMigration = $this->option('migration');
 
-        $this->info("Creating subdomain: {$subdomainName} under parent: {$parentDomain}");
+        $this->info("Creating subdomain: {$subdomainDirName} under parent domain: {$parentDirName}");
 
-        // Ensure parent domain folder
-        $parentDomainPath = app_path("Domains/{$parentDomain}");
+        // 1) Check if parent domain folder exists
+        $parentDomainPath = app_path("Domains/{$parentDirName}");
         if (!File::exists($parentDomainPath)) {
-            $this->error("Parent domain '{$parentDomain}' does not exist at '{$parentDomainPath}'.");
+            $this->error("Parent domain '{$parentDirName}' does not exist at '{$parentDomainPath}'.");
             return 1;
         }
 
-        // Subdomain folder
-        $baseDir = "{$parentDomainPath}/{$subdomainName}";
+        // 2) Create subdomain folder
+        $baseDir = "{$parentDomainPath}/{$subdomainDirName}";
         if (File::exists($baseDir) && !$this->option('force')) {
-            $this->error("Subdomain {$subdomainName} already exists. Use --force to overwrite.");
+            $this->error("Subdomain {$subdomainDirName} already exists. Use --force to overwrite.");
             return 1;
         }
 
@@ -68,83 +73,71 @@ class MakeSubdomainCommand extends Command
             }
         }
 
+        // 3) Generate stubs for Entity, Repo, DomainService => singular className
         $stubPath = __DIR__ . '/../../stubs/domain';
 
-        // (A) Entity, Repo, DomainService
         $domainStubs = [
-            'Entity.stub'        => "{$baseDir}/Entities/{$subdomainName}.php",
-            'Repository.stub'    => "{$baseDir}/Repositories/{$subdomainName}RepositoryInterface.php",
-            'DomainService.stub' => "{$baseDir}/DomainServices/{$subdomainName}Service.php",
+            'Entity.stub'        => "{$baseDir}/Entities/{$subdomainClassName}.php",
+            'Repository.stub'    => "{$baseDir}/Repositories/{$subdomainClassName}RepositoryInterface.php",
+            'DomainService.stub' => "{$baseDir}/DomainServices/{$subdomainClassName}Service.php",
         ];
         foreach ($domainStubs as $stub => $dest) {
             $this->generateStubFile("{$stubPath}/{$stub}", $dest, [
-                '{{ domainNamespace }}' => $domainNamespace,
-                '{{ actionsNamespace }}' => $actionsNamespace,
-                '{{ domain }}'          => $subdomainName,
-                '{{ domainLower }}'     => $subdomainLower,
+                '{{ parentDirName }}'     => $parentDirName,
+                '{{ parentClassName }}'   => $parentClassName,
+                '{{ subdomainDirName }}'  => $subdomainDirName,
+                '{{ subdomainClassName }}'=> $subdomainClassName,
             ]);
         }
 
-        // (B) DTO
+        // 4) DTO => e.g. "ProfileData.php"
         $dtoStub = "{$stubPath}/DataTransferObject.stub";
-        $dtoDest = "{$baseDir}/DataTransferObjects/{$subdomainName}Data.php";
+        $dtoDest = "{$baseDir}/DataTransferObjects/{$subdomainClassName}Data.php";
         $this->generateStubFile($dtoStub, $dtoDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ actionsNamespace }}' => $actionsNamespace,
-            '{{ domain }}'          => $subdomainName,
-            '{{ domainLower }}'     => $subdomainLower,
+            '{{ subdomainClassName }}' => $subdomainClassName,
         ]);
 
-        // (C) Model => app/Models/<SubdomainName>.php
+        // 5) Model => e.g. "app/Models/Profile.php"
         $modelStubFile = $softDeletes ? 'Model.soft.stub' : 'Model.stub';
         $modelStubPath = __DIR__ . "/../../stubs/model/{$modelStubFile}";
-        $modelDest     = app_path("Models/{$subdomainName}.php");
+        $modelDest     = app_path("Models/{$subdomainClassName}.php");
         $this->generateStubFile($modelStubPath, $modelDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ actionsNamespace }}' => $actionsNamespace,
-            '{{ domain }}'          => $subdomainName,
-            '{{ domainLower }}'     => $subdomainLower,
-            '{{ table }}'           => $tableName,
+            '{{ className }}' => $subdomainClassName, // "Profile"
+            '{{ table }}'     => $tableName,          // "profiles"
         ]);
 
-        // (D) Factory => database/factories/<SubdomainName>Factory.php
+        // 6) Factory => "ProfileFactory.php"
         $factoryStubPath = __DIR__ . "/../../stubs/model/Factory.stub";
-        $factoryDest     = database_path("factories/{$subdomainName}Factory.php");
+        $factoryDest     = database_path("factories/{$subdomainClassName}Factory.php");
         $this->generateStubFile($factoryStubPath, $factoryDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $subdomainName,
-            '{{ domainLower }}'     => $subdomainLower,
+            '{{ className }}' => $subdomainClassName,
         ]);
 
-        // (E) Observer => app/Observers/<SubdomainName>Observer.php
+        // 7) Observer => "ProfileObserver.php" in app/Observers
         $observerDir = app_path('Observers');
         if (!File::exists($observerDir)) {
             File::makeDirectory($observerDir, 0755, true, true);
             $this->info("Created directory: {$observerDir}");
         }
         $observerStubFile = $softDeletes ? 'Observer.soft.stub' : 'Observer.stub';
-        $observerDest     = app_path("Observers/{$subdomainName}Observer.php");
+        $observerDest     = app_path("Observers/{$subdomainClassName}Observer.php");
         $this->generateStubFile("{$stubPath}/{$observerStubFile}", $observerDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $subdomainName,
-            '{{ domainLower }}'     => $subdomainLower,
+            '{{ className }}' => $subdomainClassName,
         ]);
 
-        // (F) Policy => app/Policies/<SubdomainName>Policy.php
+        // 8) Policy => "ProfilePolicy.php" in app/Policies
         $policyDir = app_path('Policies');
         if (!File::exists($policyDir)) {
             File::makeDirectory($policyDir, 0755, true, true);
             $this->info("Created directory: {$policyDir}");
         }
         $policyStubFile = $softDeletes ? 'Policy.soft.stub' : 'Policy.stub';
-        $policyDest     = app_path("Policies/{$subdomainName}Policy.php");
+        $policyDest     = app_path("Policies/{$subdomainClassName}Policy.php");
         $this->generateStubFile("{$stubPath}/{$policyStubFile}", $policyDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $subdomainName,
-            '{{ domainLower }}'     => $subdomainLower,
+            '{{ className }}' => $subdomainClassName,
         ]);
 
-        // (G) Eloquent Repository => ensure app/Infrastructure/Persistence/Repositories
+        // 9) Eloquent Repository => "EloquentProfileRepository.php"
         $repoFile = $softDeletes
             ? __DIR__ . "/../../stubs/infrastructure/EloquentRepository.soft.stub"
             : __DIR__ . "/../../stubs/infrastructure/EloquentRepository.stub";
@@ -153,70 +146,60 @@ class MakeSubdomainCommand extends Command
             File::makeDirectory($infraDir, 0755, true, true);
             $this->info("Created directory: {$infraDir}");
         }
-        $repoDest = $infraDir . "/Eloquent{$subdomainName}Repository.php";
+        $repoDest = "{$infraDir}/Eloquent{$subdomainClassName}Repository.php";
         $this->generateStubFile($repoFile, $repoDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $subdomainName,
-            '{{ domainLower }}'     => $subdomainLower,
+            '{{ className }}' => $subdomainClassName,
         ]);
 
-        // (H) Optional migration
-        if ($createMigration) {
+        // 10) Migration => e.g. "create_profiles_table.php"
+        if ($this->option('migration')) {
             $migrationStubFile = $softDeletes ? 'Migration.soft.stub' : 'Migration.stub';
             $migrationStubPath = __DIR__ . "/../../stubs/model/{$migrationStubFile}";
             $timestamp         = date('Y_m_d_His');
             $migrationName     = "{$timestamp}_create_{$tableName}_table.php";
             $migrationDest     = database_path("migrations/{$migrationName}");
             $this->generateStubFile($migrationStubPath, $migrationDest, [
-                '{{ domainNamespace }}' => $domainNamespace,
-                '{{ domain }}'          => $subdomainName,
-                '{{ domainLower }}'     => $subdomainLower,
-                '{{ table }}'           => $tableName,
+                '{{ className }}' => $subdomainClassName,
+                '{{ table }}'     => $tableName,
             ]);
         }
 
-        // Update RepositoryServiceProvider
-        $this->updateProviderBinding($parentDomain, $subdomainName);
+        // 11) Update repository provider
+        $this->updateProviderBinding($parentDirName, $subdomainDirName, $subdomainClassName);
 
-        // Subdomain actions
-        $this->createSubdomainActions($parentDomain, $subdomainName, $domainNamespace, $actionsNamespace, $subdomainLower);
+        // 12) Subdomain actions => e.g. "app/Actions/Users/Profiles"
+        $this->createSubdomainActions($parentDirName, $subdomainDirName, $subdomainClassName);
 
-        $this->info("Subdomain {$subdomainName} has been created under parent domain {$parentDomain}.");
+        $this->info("Subdomain {$subdomainDirName} has been created under parent domain {$parentDirName}.");
         return 0;
     }
 
-    protected function createSubdomainActions(
-        string $parentDomain,
-        string $subdomainName,
-        string $domainNamespace,
-        string $actionsNamespace,
-        string $subdomainLower
-    ): void {
-        $actionsDir = app_path("Actions/{$parentDomain}/{$subdomainName}");
+    protected function createSubdomainActions(string $parentDirName, string $subdomainDirName, string $subdomainClassName): void
+    {
+        // e.g. "app/Actions/Users/Profiles"
+        $actionsDir = app_path("Actions/{$parentDirName}/{$subdomainDirName}");
         if (!File::exists($actionsDir)) {
             File::makeDirectory($actionsDir, 0755, true, true);
             $this->info("Created actions directory: {$actionsDir}");
         }
 
+        // We want "Create.php", "Update.php", etc. with no domain in the filename
         $actionStubs = [
-            'Create.stub' => "Create{$subdomainName}Action.php",
-            'Update.stub' => "Update{$subdomainName}Action.php",
-            'Delete.stub' => "Delete{$subdomainName}Action.php",
-            'Index.stub'  => "Index{$subdomainName}Action.php",
-            'Show.stub'   => "Show{$subdomainName}Action.php",
+            'Create.stub' => 'Create.php',
+            'Update.stub' => 'Update.php',
+            'Delete.stub' => 'Delete.php',
+            'Index.stub'  => 'Index.php',
+            'Show.stub'   => 'Show.php',
         ];
         if ($this->option('soft-deletes')) {
-            $actionStubs['Restore.stub']     = "Restore{$subdomainName}Action.php";
-            $actionStubs['ForceDelete.stub'] = "ForceDelete{$subdomainName}Action.php";
+            $actionStubs['Restore.stub']     = 'Restore.php';
+            $actionStubs['ForceDelete.stub'] = 'ForceDelete.php';
         }
 
         $actionStubPath = __DIR__ . '/../../stubs/actions';
         foreach ($actionStubs as $stub => $filename) {
             $this->generateStubFile("{$actionStubPath}/{$stub}", "{$actionsDir}/{$filename}", [
-                '{{ domainNamespace }}' => $domainNamespace,
-                '{{ actionsNamespace }}' => $actionsNamespace,
-                '{{ domain }}'          => $subdomainName,
-                '{{ domainLower }}'     => $subdomainLower,
+                '{{ className }}' => $subdomainClassName,
             ]);
         }
     }
@@ -229,7 +212,11 @@ class MakeSubdomainCommand extends Command
         }
         $contents = File::get($stubPath);
         foreach ($placeholders as $search => $replace) {
-            $contents = str_replace($search, $replace, $contents);
+            $contents = str_replace(
+                ['{{ ' . $search . ' }}'],
+                [$replace],
+                $contents
+            );
         }
         $this->createFile($destination, $contents);
     }
@@ -249,7 +236,7 @@ class MakeSubdomainCommand extends Command
             : "Created file: {$destination}");
     }
 
-    protected function updateProviderBinding(string $parentDomain, string $subdomainName): void
+    protected function updateProviderBinding(string $parentDirName, string $subdomainDirName, string $subdomainClassName): void
     {
         $providerPath = app_path('Providers/RepositoryServiceProvider.php');
         if (!File::exists($providerPath)) {
@@ -262,12 +249,14 @@ class MakeSubdomainCommand extends Command
         }
 
         $providerContent = File::get($providerPath);
-        $bindingSignature = "\\App\\Domains\\{$parentDomain}\\{$subdomainName}\\Repositories\\{$subdomainName}RepositoryInterface::class";
+
+        // e.g. \App\Domains\Users\Profiles\Repositories\ProfileRepositoryInterface::class
+        $bindingSignature = "\\App\\Domains\\{$parentDirName}\\{$subdomainDirName}\\Repositories\\{$subdomainClassName}RepositoryInterface::class";
 
         if (!str_contains($providerContent, $bindingSignature)) {
             $bindingLine = "\n        \$this->app->bind(\n"
-                . "            \\App\\Domains\\{$parentDomain}\\{$subdomainName}\\Repositories\\{$subdomainName}RepositoryInterface::class,\n"
-                . "            \\App\\Infrastructure\\Persistence\\Repositories\\Eloquent{$subdomainName}Repository::class\n"
+                . "            \\App\\Domains\\{$parentDirName}\\{$subdomainDirName}\\Repositories\\{$subdomainClassName}RepositoryInterface::class,\n"
+                . "            \\App\\Infrastructure\\Persistence\\Repositories\\Eloquent{$subdomainClassName}Repository::class\n"
                 . "        );";
 
             $pattern = '/(public function register\(\)(?:\s*:\s*\w+)?\s*\{\s*)([^}]*)(\})/s';
@@ -277,11 +266,11 @@ class MakeSubdomainCommand extends Command
                 File::put($providerPath, $providerContent);
                 $this->info("Added subdomain binding to RepositoryServiceProvider.");
             } else {
-                $this->warn("register() not found in RepositoryServiceProvider. Add manually:");
+                $this->warn("Could not locate register() method in RepositoryServiceProvider. Please add manually:");
                 $this->line($bindingLine);
             }
         } else {
-            $this->info("Repository binding for subdomain {$subdomainName} already exists.");
+            $this->info("Repository binding for subdomain {$subdomainDirName} already exists.");
         }
     }
 }

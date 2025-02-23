@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 class MakeDomainCommand extends Command
 {
     protected $signature = 'make:domain
-                            {name : The name of the domain}
+                            {name : The (plural) name of the domain, e.g. "Users"}
                             {--migration : Create a migration file}
                             {--soft-deletes : Include soft deletes functionality}
                             {--force : Overwrite any existing files without prompting}';
@@ -19,25 +19,26 @@ class MakeDomainCommand extends Command
 
     public function handle(): int
     {
-        // 1) Preserve the rawName exactly as typed
-        $rawName    = $this->argument('name');
-        $domainName = $rawName; // No more Str::studly/Str::singular
-        $domainLower = Str::camel($domainName);
+        // The user types "Users" (plural).
+        // We'll store the directory name as is (plural),
+        // but produce singular class names.
+        $rawName        = $this->argument('name'); // e.g. "Users"
+        $directoryName  = Str::studly($rawName);   // e.g. "Users"
+        $className      = Str::singular($directoryName); // e.g. "User"
 
-        // 2) For namespacing, we still do "App\\Domains\\<String>"
-        $domainNamespace  = "App\\Domains\\{$domainName}";
-        $actionsNamespace = "App\\Actions\\{$domainName}";
+        // So the final domain folder is app/Domains/Users
+        // but classes are "User.php", "UserService.php", etc.
 
-        // 3) Table name
-        $tableName = Str::snake(Str::plural($rawName)); // e.g. if rawName="TestUser_AbC", => "test_user__ab_cs"
+        // For DB table, we want "users" from "User" => plural => "users"
+        $tableName = Str::snake(Str::plural($className)); // "users"
 
         $softDeletes     = $this->option('soft-deletes');
         $createMigration = $this->option('migration');
 
-        $this->info("Creating domain: {$domainName}");
+        $this->info("Creating domain: {$directoryName}");
 
-        // 4) Create domain directories
-        $baseDir = app_path("Domains/{$domainName}");
+        // 1) Create domain directories: app/Domains/Users
+        $baseDir = app_path("Domains/{$directoryName}");
         $directories = [
             $baseDir,
             "{$baseDir}/Entities",
@@ -45,7 +46,6 @@ class MakeDomainCommand extends Command
             "{$baseDir}/DomainServices",
             "{$baseDir}/DataTransferObjects",
         ];
-
         foreach ($directories as $dir) {
             if (!File::exists($dir)) {
                 File::makeDirectory($dir, 0755, true, true);
@@ -55,62 +55,58 @@ class MakeDomainCommand extends Command
             }
         }
 
+        // 2) Stubs directory
         $stubPath = __DIR__ . '/../../stubs/domain';
 
-        // (A) Entity, Repo Interface, Domain Service
+        // 3) Entities, Repo Interface, Domain Service => singular class
         $domainStubs = [
-            'Entity.stub'        => "{$baseDir}/Entities/{$domainName}.php",
-            'Repository.stub'    => "{$baseDir}/Repositories/{$domainName}RepositoryInterface.php",
-            'DomainService.stub' => "{$baseDir}/DomainServices/{$domainName}Service.php",
+            'Entity.stub'        => "{$baseDir}/Entities/{$className}.php",
+            'Repository.stub'    => "{$baseDir}/Repositories/{$className}RepositoryInterface.php",
+            'DomainService.stub' => "{$baseDir}/DomainServices/{$className}Service.php",
         ];
         foreach ($domainStubs as $stub => $dest) {
-            $this->generateStubFile("{$stubPath}/{$stub}", $dest, [
-                '{{ domainNamespace }}' => $domainNamespace,
-                '{{ actionsNamespace }}' => $actionsNamespace,
-                '{{ domain }}'          => $domainName,
-                '{{ domainLower }}'     => $domainLower,
-            ]);
+            $this->generateStubFile(
+                "{$stubPath}/{$stub}",
+                $dest,
+                [
+                    '{{ directoryName }}' => $directoryName, // e.g. "Users"
+                    '{{ className }}'     => $className,     // e.g. "User"
+                ]
+            );
         }
 
-        // (B) DTO
+        // 4) DTO => singular class
         $dtoStub = "{$stubPath}/DataTransferObject.stub";
-        $dtoDest = "{$baseDir}/DataTransferObjects/{$domainName}Data.php";
+        $dtoDest = "{$baseDir}/DataTransferObjects/{$className}Data.php";
         $this->generateStubFile($dtoStub, $dtoDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ actionsNamespace }}' => $actionsNamespace,
-            '{{ domain }}'          => $domainName,
-            '{{ domainLower }}'     => $domainLower,
+            '{{ directoryName }}' => $directoryName,
+            '{{ className }}'     => $className,
         ]);
 
-        // 6) BaseModel
+        // 5) Possibly create BaseModel if missing
         $baseModelPath = app_path('Models/BaseModel.php');
         if (!File::exists($baseModelPath)) {
             $baseModelStub = __DIR__ . '/../../stubs/model/BaseModel.stub';
             $this->generateStubFile($baseModelStub, $baseModelPath, []);
         }
 
-        // 7) Domain Model
+        // 6) Model => singular class name in app/Models
         $modelStubFile = $softDeletes ? 'Model.soft.stub' : 'Model.stub';
         $modelStubPath = __DIR__ . "/../../stubs/model/{$modelStubFile}";
-        $modelDest     = app_path("Models/{$domainName}.php");
+        $modelDest     = app_path("Models/{$className}.php");
         $this->generateStubFile($modelStubPath, $modelDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ actionsNamespace }}' => $actionsNamespace,
-            '{{ domain }}'          => $domainName,
-            '{{ domainLower }}'     => $domainLower,
-            '{{ table }}'           => $tableName,
+            '{{ className }}' => $className,     // "User"
+            '{{ table }}'     => $tableName,     // "users"
         ]);
 
-        // 8) Factory
+        // 7) Factory => singular class name => "UserFactory.php"
         $factoryStub = __DIR__ . "/../../stubs/model/Factory.stub";
-        $factoryDest = database_path("factories/{$domainName}Factory.php");
+        $factoryDest = database_path("factories/{$className}Factory.php");
         $this->generateStubFile($factoryStub, $factoryDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $domainName,
-            '{{ domainLower }}'     => $domainLower,
+            '{{ className }}' => $className,
         ]);
 
-        // 9) Observer => ensure app/Observers
+        // 8) Observer => "UserObserver.php" in app/Observers
         $observerDir = app_path('Observers');
         if (!File::exists($observerDir)) {
             File::makeDirectory($observerDir, 0755, true, true);
@@ -118,28 +114,25 @@ class MakeDomainCommand extends Command
         }
         $observerStubFile = $softDeletes ? 'Observer.soft.stub' : 'Observer.stub';
         $observerStubPath = "{$stubPath}/{$observerStubFile}";
-        $observerDest     = app_path("Observers/{$domainName}Observer.php");
+        $observerDest     = app_path("Observers/{$className}Observer.php");
         $this->generateStubFile($observerStubPath, $observerDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $domainName,
-            '{{ domainLower }}'     => $domainLower,
+            '{{ className }}' => $className,
         ]);
 
-        // 10) Policy => ensure app/Policies
+        // 9) Policy => "UserPolicy.php" in app/Policies
         $policyDir = app_path('Policies');
         if (!File::exists($policyDir)) {
             File::makeDirectory($policyDir, 0755, true, true);
             $this->info("Created directory: {$policyDir}");
         }
         $policyStubFile = $softDeletes ? 'Policy.soft.stub' : 'Policy.stub';
-        $policyDest     = app_path("Policies/{$domainName}Policy.php");
-        $this->generateStubFile("{$stubPath}/{$policyStubFile}", $policyDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $domainName,
-            '{{ domainLower }}'     => $domainLower,
+        $policyStubPath = "{$stubPath}/{$policyStubFile}";
+        $policyDest     = app_path("Policies/{$className}Policy.php");
+        $this->generateStubFile($policyStubPath, $policyDest, [
+            '{{ className }}' => $className,
         ]);
 
-        // 11) Concrete Repository => ensure app/Infrastructure/Persistence/Repositories
+        // 10) Concrete Repository => "UserRepository.php" in app/Infrastructure/Persistence/Repositories
         $infraDir = app_path('Infrastructure/Persistence/Repositories');
         if (!File::exists($infraDir)) {
             File::makeDirectory($infraDir, 0755, true, true);
@@ -148,65 +141,65 @@ class MakeDomainCommand extends Command
         $repoStubFile = $softDeletes
             ? __DIR__ . "/../../stubs/infrastructure/Repository.soft.stub"
             : __DIR__ . "/../../stubs/infrastructure/Repository.stub";
-        $repoDest = $infraDir . "/{$domainName}Repository.php";
+        $repoDest = "{$infraDir}/{$className}Repository.php";
         $this->generateStubFile($repoStubFile, $repoDest, [
-            '{{ domainNamespace }}' => $domainNamespace,
-            '{{ domain }}'          => $domainName,
-            '{{ domainLower }}'     => $domainLower,
+            '{{ className }}' => $className,
         ]);
 
-        // 12) Optional migration
+        // 11) Migration => "create_users_table" if requested
         if ($createMigration) {
             $migrationFile = $softDeletes ? 'Migration.soft.stub' : 'Migration.stub';
             $migrationStub = __DIR__ . "/../../stubs/model/{$migrationFile}";
             $timestamp     = date('Y_m_d_His');
             $migrationName = "{$timestamp}_create_{$tableName}_table.php";
             $migrationDest = database_path("migrations/{$migrationName}");
-
             $this->generateStubFile($migrationStub, $migrationDest, [
-                '{{ domainNamespace }}' => $domainNamespace,
-                '{{ domain }}'          => $domainName,
-                '{{ domainLower }}'     => $domainLower,
-                '{{ table }}'           => $tableName,
+                '{{ className }}' => $className,
+                '{{ table }}'     => $tableName,
             ]);
         }
 
-        // 13) Update RepositoryServiceProvider
-        $this->updateRepositoryBinding($domainName);
+        // 12) Update the RepositoryServiceProvider with a binding
+        $this->updateRepositoryBinding($directoryName, $className);
 
-        // 14) CRUD Actions => app/Actions/<domainName>
-        $actionsDir = app_path("Actions/{$domainName}");
+        // 13) Create CRUD actions => in app/Actions/Users
+        $actionsDir = app_path("Actions/{$directoryName}");
         if (!File::exists($actionsDir)) {
             File::makeDirectory($actionsDir, 0755, true, true);
             $this->info("Created directory: {$actionsDir}");
         }
+
+        // Action stubs: "Create.stub" => "Create.php", etc.
         $actionStubs = [
-            'Create.stub' => "Create{$domainName}Action.php",
-            'Update.stub' => "Update{$domainName}Action.php",
-            'Delete.stub' => "Delete{$domainName}Action.php",
-            'Index.stub'  => "Index{$domainName}Action.php",
-            'Show.stub'   => "Show{$domainName}Action.php",
+            'Create.stub' => "Create.php",
+            'Update.stub' => "Update.php",
+            'Delete.stub' => "Delete.php",
+            'Index.stub'  => "Index.php",
+            'Show.stub'   => "Show.php",
         ];
         if ($softDeletes) {
-            $actionStubs['Restore.stub']     = "Restore{$domainName}Action.php";
-            $actionStubs['ForceDelete.stub'] = "ForceDelete{$domainName}Action.php";
-        }
-        $actionStubDir = __DIR__ . '/../../stubs/actions';
-        foreach ($actionStubs as $stub => $fileName) {
-            $this->generateStubFile("{$actionStubDir}/{$stub}", "{$actionsDir}/{$fileName}", [
-                '{{ domainNamespace }}' => $domainNamespace,
-                '{{ actionsNamespace }}' => $actionsNamespace,
-                '{{ domain }}'          => $domainName,
-                '{{ domainLower }}'     => $domainLower,
-            ]);
+            $actionStubs['Restore.stub']     = "Restore.php";
+            $actionStubs['ForceDelete.stub'] = "ForceDelete.php";
         }
 
-        $this->info("Domain {$domainName} has been successfully created.");
+        $actionStubDir = __DIR__ . '/../../stubs/actions';
+        foreach ($actionStubs as $stub => $fileName) {
+            $this->generateStubFile(
+                "{$actionStubDir}/{$stub}",
+                "{$actionsDir}/{$fileName}",
+                [
+                    '{{ className }}'     => $className,
+                    '{{ directoryName }}' => $directoryName,
+                ]
+            );
+        }
+
+        $this->info("Domain {$directoryName} has been successfully created.");
         return 0;
     }
 
     /**
-     * Replace placeholders in a stub file & create final file.
+     * Helper: read stub, replace placeholders, create file.
      */
     protected function generateStubFile(string $stubPath, string $destination, array $placeholders): void
     {
@@ -216,13 +209,17 @@ class MakeDomainCommand extends Command
         }
         $contents = File::get($stubPath);
         foreach ($placeholders as $search => $replace) {
-            $contents = str_replace($search, $replace, $contents);
+            $contents = str_replace(
+                ['{{ ' . $search . ' }}'],
+                [$replace],
+                $contents
+            );
         }
         $this->createFile($destination, $contents);
     }
 
     /**
-     * Create or overwrite file, respecting --force.
+     * Create or overwrite a file, respecting --force.
      */
     protected function createFile(string $destination, string $contents): void
     {
@@ -236,14 +233,16 @@ class MakeDomainCommand extends Command
         File::put($destination, $contents);
         $this->info(File::exists($destination)
             ? "Created/Replaced file: {$destination}"
-            : "Created file: {$destination}"
-        );
+            : "Created file: {$destination}");
     }
 
     /**
-     * Update RepositoryServiceProvider with domain binding.
+     * Update the repository binding in RepositoryServiceProvider.
+     *
+     * @param string $directoryName The domain's plural name, e.g. "Users"
+     * @param string $className The singular class name, e.g. "User"
      */
-    protected function updateRepositoryBinding(string $domainName): void
+    protected function updateRepositoryBinding(string $directoryName, string $className): void
     {
         $providerPath = app_path('Providers/RepositoryServiceProvider.php');
         if (!File::exists($providerPath)) {
@@ -254,13 +253,16 @@ class MakeDomainCommand extends Command
         if (!File::exists($providerPath)) {
             return;
         }
-        $providerContent  = File::get($providerPath);
-        $bindingSignature = "\\App\\Domains\\{$domainName}\\Repositories\\{$domainName}RepositoryInterface::class";
+
+        $providerContent = File::get($providerPath);
+
+        // We'll reference \App\Domains\Users\Repositories\UserRepositoryInterface::class
+        $bindingSignature = "\\App\\Domains\\{$directoryName}\\Repositories\\{$className}RepositoryInterface::class";
 
         if (!str_contains($providerContent, $bindingSignature)) {
             $bindingLine = "\n        \$this->app->bind(\n"
-                . "            \\App\\Domains\\{$domainName}\\Repositories\\{$domainName}RepositoryInterface::class,\n"
-                . "            \\App\\Infrastructure\\Persistence\\Repositories\\{$domainName}Repository::class\n"
+                . "            \\App\\Domains\\{$directoryName}\\Repositories\\{$className}RepositoryInterface::class,\n"
+                . "            \\App\\Infrastructure\\Persistence\\Repositories\\{$className}Repository::class\n"
                 . "        );";
 
             $pattern = '/(public function register\(\)(?:\s*:\s*\w+)?\s*\{\s*)([^}]*)(\})/s';
@@ -270,11 +272,11 @@ class MakeDomainCommand extends Command
                 File::put($providerPath, $providerContent);
                 $this->info("Added repository binding to RepositoryServiceProvider.");
             } else {
-                $this->warn("Could not locate register() method. Please add manually:");
+                $this->warn("Could not locate register() method in RepositoryServiceProvider. Please add manually:");
                 $this->line($bindingLine);
             }
         } else {
-            $this->info("Repository binding for {$domainName} already exists in RepositoryServiceProvider.");
+            $this->info("Repository binding for domain {$directoryName} already exists.");
         }
     }
 }
