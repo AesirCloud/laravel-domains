@@ -5,52 +5,52 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 beforeEach(function () {
-    // Domain + subdomain in PascalCase
-    $this->domainName = 'TestUser' . Str::studly(Str::random(4));
-    $this->subdomain  = 'AuthenticationLogs' . Str::studly(Str::random(4));
+    $this->pluralDomain    = 'Users' . Str::studly(Str::random(2));
+    $this->pluralSubdomain = 'Profiles' . Str::studly(Str::random(2));
 
-    // Cleanup domain folder if leftover from a previous test
-    File::deleteDirectory(app_path("Domains/{$this->domainName}"));
-    File::deleteDirectory(app_path('ValueObjects'));
-});
-
-afterEach(function () {
-    File::deleteDirectory(app_path("Domains/{$this->domainName}"));
+    File::deleteDirectory(app_path("Domains/{$this->pluralDomain}"));
     File::deleteDirectory(app_path('ValueObjects'));
 });
 
 test('it scaffolds a value object outside of any domain', function () {
-    $voName = 'MyAwesomeVo' . Str::studly(Str::random(3)); // e.g. "MyAwesomeVoXyZ"
+    $voName = 'Address' . Str::studly(Str::random(2)); // e.g. "AddressAb"
     $exitCode = Artisan::call('make:value-object ' . $voName . ' --force');
 
+    // Should create app/ValueObjects/AddressAbValueObject.php
+    $fileName = $voName . 'ValueObject.php';
     expect($exitCode)->toBe(0)
-        ->and(File::exists(app_path("ValueObjects/{$voName}ValueObject.php")))->toBeTrue();
+        ->and(File::exists(app_path("ValueObjects/{$fileName}")))->toBeTrue();
 });
 
 test('it scaffolds a value object in a specific domain', function () {
-    // Create domain first
-    Artisan::call('make:domain ' . $this->domainName . ' --force');
+    // Create the domain "UsersAb"
+    Artisan::call('make:domain ' . $this->pluralDomain . ' --force');
 
     // Then create the value object
-    $voName = 'Address' . Str::studly(Str::random(3));
+    $voName = 'Email' . Str::studly(Str::random(2)); // e.g. "EmailCd"
     $exitCode = Artisan::call(
-        'make:value-object ' . $voName . ' --domain=' . $this->domainName
+        'make:value-object ' . $voName . ' --domain=' . $this->pluralDomain
     );
 
+    $fileName = $voName . 'ValueObject.php';
     expect($exitCode)->toBe(0)
-        ->and(File::exists(app_path("Domains/{$this->domainName}/ValueObjects/{$voName}ValueObject.php")))->toBeTrue();
+        ->and(File::exists(app_path("Domains/{$this->pluralDomain}/ValueObjects/{$fileName}")))->toBeTrue();
 });
 
 test('it scaffolds a value object in a subdomain', function () {
-    // Ensure domain + subdomain
-    Artisan::call('make:domain ' . $this->domainName . ' --force');
-    Artisan::call('make:subdomain ' . $this->domainName . ' ' . $this->subdomain . ' --force');
+    // Create domain + subdomain
+    Artisan::call('make:domain ' . $this->pluralDomain . ' --force');
+    Artisan::call('make:subdomain ' . $this->pluralDomain . ' ' . $this->pluralSubdomain . ' --force');
 
-    $voName = 'IpAddress' . Str::studly(Str::random(3));
+    $voName = 'IpAddress' . Str::studly(Str::random(2));
     $exitCode = Artisan::call(
-        'make:value-object ' . $voName . ' --domain=' . $this->domainName . ' --subdomain=' . $this->subdomain . ' --force'
+        'make:value-object ' . $voName
+        . ' --domain=' . $this->pluralDomain
+        . ' --subdomain=' . $this->pluralSubdomain
+        . ' --force'
     );
 
+    $fileName = $voName . 'ValueObject.php';
     expect($exitCode)->toBe(0)
-        ->and(File::exists(app_path("Domains/{$this->domainName}/{$this->subdomain}/ValueObjects/{$voName}ValueObject.php")))->toBeTrue();
+        ->and(File::exists(app_path("Domains/{$this->pluralDomain}/{$this->pluralSubdomain}/ValueObjects/{$fileName}")))->toBeTrue();
 });
