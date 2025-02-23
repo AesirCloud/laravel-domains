@@ -12,7 +12,7 @@ class MakeValueObjectCommand extends Command
                             {name : The name of the value object}
                             {--domain= : The parent domain (e.g. "User")}
                             {--subdomain= : The subdomain (e.g. "AuthenticationLogs")}
-                            {--force : Overwrite any existing files without prompting}';
+                            {--force : Overwrite existing files without prompting}';
 
     protected $description = 'Scaffold a new value object. If a domain/subdomain is provided, places the VO in that folder & namespace. Otherwise, uses app/ValueObjects.';
 
@@ -20,57 +20,50 @@ class MakeValueObjectCommand extends Command
     {
         $rawName = $this->argument('name');
 
+        // If not already "SomethingValueObject", append "ValueObject"
         if (!Str::endsWith($rawName, 'ValueObject')) {
             $rawName .= 'ValueObject';
         }
 
         $domainOption    = $this->option('domain');
-
         $subdomainOption = $this->option('subdomain');
 
-        $directory = null;
-
-        $valueObjectNamespace = null;
+        $valueObjectNamespace = '';
+        $directory = '';
 
         if ($domainOption) {
-            $domain = Str::studly($domainOption);
+            // preserve raw domain
+            $domain = $domainOption;
 
             if ($subdomainOption) {
-                $subdomain = Str::studly($subdomainOption);
-
+                // preserve raw subdomain
+                $subdomain = $subdomainOption;
                 $valueObjectNamespace = "App\\Domains\\{$domain}\\{$subdomain}\\ValueObjects";
-
-                $directory = app_path("Domains/{$domain}/{$subdomain}/ValueObjects");
+                $directory            = app_path("Domains/{$domain}/{$subdomain}/ValueObjects");
             } else {
                 $valueObjectNamespace = "App\\Domains\\{$domain}\\ValueObjects";
-
-                $directory = app_path("Domains/{$domain}/ValueObjects");
+                $directory            = app_path("Domains/{$domain}/ValueObjects");
             }
         } else {
             $valueObjectNamespace = "App\\ValueObjects";
-
-            $directory = app_path("ValueObjects");
+            $directory            = app_path("ValueObjects");
         }
 
+        // Ensure the VO directory
         if (!File::exists($directory)) {
             File::makeDirectory($directory, 0755, true, true);
-
             $this->info("Created directory: {$directory}");
         }
 
         $destination = "{$directory}/{$rawName}.php";
-
         $stubPath = __DIR__ . '/../../stubs/domain/ValueObject.stub';
-
         if (!File::exists($stubPath)) {
             $this->error("ValueObject stub not found: {$stubPath}");
-
             return 1;
         }
 
-        // Load + replace placeholders
+        // placeholders
         $contents = File::get($stubPath);
-
         $contents = str_replace([
             '{{ valueObjectNamespace }}',
             '{{ name }}'
@@ -80,7 +73,6 @@ class MakeValueObjectCommand extends Command
         ], $contents);
 
         $this->createFile($destination, $contents);
-
         $this->info("Value Object {$rawName} created at {$destination}.");
 
         return 0;
@@ -89,19 +81,17 @@ class MakeValueObjectCommand extends Command
     protected function createFile(string $destination, string $contents): void
     {
         $force = $this->option('force');
-
         if (File::exists($destination) && !$force) {
             if (!$this->confirm("File {$destination} already exists. Overwrite?", true)) {
                 $this->info("Skipped file: {$destination}");
-
                 return;
             }
         }
 
         File::put($destination, $contents);
-
         $this->info(File::exists($destination)
             ? "Created/Replaced file: {$destination}"
-            : "Created file: {$destination}");
+            : "Created file: {$destination}"
+        );
     }
 }

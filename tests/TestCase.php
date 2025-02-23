@@ -7,7 +7,7 @@ use AesirCloud\LaravelDomains\Providers\DomainServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         // Register your package's service provider so commands & stubs are available
         return [

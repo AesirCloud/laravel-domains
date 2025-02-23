@@ -2,48 +2,69 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 beforeEach(function () {
-    // Cleanup: remove any leftover test directories.
-    File::deleteDirectory(app_path('Domains/TestUser'));
+    // We'll store a random domain name in PascalCase, e.g. "TestUserAb12"
+    $this->domainName = 'TestUser' . Str::studly(Str::random(4));
+
+    // Remove leftover migrations referencing this domain's table name
+    $tableName = Str::snake(Str::plural($this->domainName));
+    collect(File::files(database_path('migrations')))->each(function ($file) use ($tableName) {
+        if (str_contains($file->getFilename(), "create_{$tableName}_table")) {
+            File::delete($file->getPathname());
+        }
+    });
+});
+
+afterEach(function () {
+    // Remove the domain folder and actions
+    File::deleteDirectory(app_path("Domains/{$this->domainName}"));
+    File::deleteDirectory(app_path("Actions/{$this->domainName}"));
+
+    // Remove the model
+    $modelPath = app_path("Models/{$this->domainName}.php");
+    if (File::exists($modelPath)) {
+        File::delete($modelPath);
+    }
 });
 
 test('it scaffolds a domain without migration or soft-deletes', function () {
-    // Run the command
-    $exitCode = Artisan::call('make:domain TestUser');
+    // e.g. "make:domain TestUserAb12"
+    $exitCode = Artisan::call('make:domain ' . $this->domainName);
 
-    // Check exit code
     expect($exitCode)->toBe(0)
-        ->and(File::exists(app_path('Domains/TestUser')))->toBeTrue()
-        ->and(File::exists(app_path('Domains/TestUser/Entities/TestUser.php')))->toBeTrue()
-        ->and(File::exists(app_path('Models/TestUser.php')))->toBeTrue();
+        // Domain folder
+        ->and(File::exists(app_path("Domains/{$this->domainName}")))->toBeTrue()
+        // Entity
+        ->and(File::exists(app_path("Domains/{$this->domainName}/Entities/{$this->domainName}.php")))->toBeTrue()
+        // Model
+        ->and(File::exists(app_path("Models/{$this->domainName}.php")))->toBeTrue();
 
-    // Check that a migration was NOT created
-    $files = File::files(database_path('migrations'));
-    $migrationCreated = collect($files)
-        ->contains(fn ($file) => str_contains($file->getFilename(), 'create_test_users_table'));
-
+    // No migration should be present for this domain’s table
+    $domainTable = Str::snake(Str::plural($this->domainName));
+    $migrationCreated = collect(File::files(database_path('migrations')))
+        ->contains(fn($file) => str_contains($file->getFilename(), "create_{$domainTable}_table"));
     expect($migrationCreated)->toBeFalse();
 });
 
 test('it scaffolds a domain with migration and soft-deletes', function () {
-    // Run the command with additional options
-    $exitCode = Artisan::call('make:domain TestUser --migration --soft-deletes --force');
+    $exitCode = Artisan::call(
+        'make:domain ' . $this->domainName . ' --migration --soft-deletes --force'
+    );
 
     expect($exitCode)->toBe(0)
-        ->and(File::exists(app_path('Domains/TestUser/DataTransferObjects/TestUserData.php')))->toBeTrue()
-        ->and(File::exists(app_path('Models/TestUser.php')))->toBeTrue();
+        ->and(File::exists(app_path("Domains/{$this->domainName}/DataTransferObjects/{$this->domainName}Data.php")))->toBeTrue()
+        ->and(File::exists(app_path("Models/{$this->domainName}.php")))->toBeTrue();
 
-    // Check that a migration was created
-    $files = File::files(database_path('migrations'));
-    $migrationFile = collect($files)
-        ->first(fn ($file) => str_contains($file->getFilename(), 'create_test_users_table'));
+    // Confirm the migration was created
+    $domainTable = Str::snake(Str::plural($this->domainName));
+    $migrationFile = collect(File::files(database_path('migrations')))
+        ->first(fn($file) => str_contains($file->getFilename(), "create_{$domainTable}_table"));
 
     expect($migrationFile)->not->toBeNull();
 
-    // Optionally, check contents of the migration
-    $migrationContents = File::get($migrationFile->getPathname());
-    expect($migrationContents)->toContain('$table->softDeletes();');
-
-    // Because we used --force, no prompt was asked to overwrite anything.
+    // Confirm soft deletes
+    $contents = File::get($migrationFile->getPathname());
+    expect($contents)->toContain('$table->softDeletes();');
 });
