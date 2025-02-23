@@ -3,6 +3,7 @@
 namespace AesirCloud\LaravelDomains\Providers;
 
 use AesirCloud\LaravelDomains\Commands\MakeDomainCommand;
+use AesirCloud\LaravelDomains\Commands\MakeSubdomainCommand;
 use AesirCloud\LaravelDomains\Commands\MakeValueObjectCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +25,7 @@ class DomainServiceProvider extends ServiceProvider
             // Register the console command.
             $this->commands([
                 MakeDomainCommand::class,
+                MakeSubdomainCommand::class,
                 MakeValueObjectCommand::class,
             ]);
         }

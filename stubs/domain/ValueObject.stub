@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Generic\ValueObjects;
+namespace {{ valueObjectNamespace }};
 
 class {{ name }}
 {
@@ -16,7 +16,7 @@ class {{ name }}
      *
      * @param mixed $value
      */
-    public function __construct($value): void
+    public function __construct($value)
     {
         // Optionally, add validation or transformation logic here.
         $this->value = $value;

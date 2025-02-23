@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Domains\{{ domain }}\DomainServices;
+namespace {{ domainNamespace }}\DomainServices;
 
-use App\Infrastructure\Persistence\Repositories\{{ domain }}Repository;
+use {{ domainNamespace }}\Repositories\{{ domain }}RepositoryInterface;
+use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
 
 class {{ domain }}Service
 {

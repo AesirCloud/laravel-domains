@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Actions\{{ domain }};
+namespace {{ actionsNamespace }};
 
 use Lorisleiva\Actions\Concerns\AsAction;
-use App\Domains\{{ domain }}\Entities\{{ domain }};
-use App\Domains\{{ domain }}\DomainServices\{{ domain }}Service;
-use App\Domains\{{ domain }}\DataTransferObjects\{{ domain }}Data;
+use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
+use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
+use {{ domainNamespace }}\Entities\{{ domain }};
 
 class Create{{ domain }}Action
 {

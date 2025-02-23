@@ -10,80 +10,88 @@ class MakeValueObjectCommand extends Command
 {
     protected $signature = 'make:value-object
                             {name : The name of the value object}
-                            {--domain= : The domain this value object belongs to (optional)}
-                            {--force : Overwrite any existing files without prompting}';
+                            {--domain= : The parent domain (e.g. "User")}
+                            {--subdomain= : The subdomain (e.g. "AuthenticationLogs")}
+                            {--force : Overwrite existing files without prompting}';
 
-    protected $description = 'Scaffold a new value object. If a domain is provided, the value object will be placed in that domain’s folder.';
+    protected $description = 'Scaffold a new value object. If a domain/subdomain is provided, places the VO in that folder & namespace. Otherwise, uses app/ValueObjects.';
 
-    public function handle()
+    public function handle(): int
     {
-        // Get the provided name and optional domain
-        $rawName      = $this->argument('name');
-        $domainOption = $this->option('domain');
+        $rawName = $this->argument('name');
 
-        // Append "ValueObject" if not already present
+        // If not already "SomethingValueObject", append "ValueObject"
         if (!Str::endsWith($rawName, 'ValueObject')) {
-            $rawName .= 'ValueObject'; // e.g. "OrderIdValueObject"
+            $rawName .= 'ValueObject';
         }
 
-        // If a domain is specified, studly-case it.
+        $domainOption    = $this->option('domain');
+        $subdomainOption = $this->option('subdomain');
+
+        $valueObjectNamespace = '';
+        $directory = '';
+
         if ($domainOption) {
-            $domain = Str::studly($domainOption);
-            $directory = app_path("Domains/{$domain}/ValueObjects");
+            // preserve raw domain
+            $domain = $domainOption;
+
+            if ($subdomainOption) {
+                // preserve raw subdomain
+                $subdomain = $subdomainOption;
+                $valueObjectNamespace = "App\\Domains\\{$domain}\\{$subdomain}\\ValueObjects";
+                $directory            = app_path("Domains/{$domain}/{$subdomain}/ValueObjects");
+            } else {
+                $valueObjectNamespace = "App\\Domains\\{$domain}\\ValueObjects";
+                $directory            = app_path("Domains/{$domain}/ValueObjects");
+            }
         } else {
-            $directory = app_path("ValueObjects");
+            $valueObjectNamespace = "App\\ValueObjects";
+            $directory            = app_path("ValueObjects");
         }
 
-        // Ensure the directory exists
+        // Ensure the VO directory
         if (!File::exists($directory)) {
             File::makeDirectory($directory, 0755, true, true);
             $this->info("Created directory: {$directory}");
         }
 
-        // Destination file path
-        $destination = $directory . "/{$rawName}.php";
-
-        // Locate the stub file
+        $destination = "{$directory}/{$rawName}.php";
         $stubPath = __DIR__ . '/../../stubs/domain/ValueObject.stub';
         if (!File::exists($stubPath)) {
-            $this->error("ValueObject stub not found at {$stubPath}");
+            $this->error("ValueObject stub not found: {$stubPath}");
             return 1;
         }
 
-        // Read the stub and replace placeholder
+        // placeholders
         $contents = File::get($stubPath);
-        $contents = str_replace('{{ name }}', $rawName, $contents);
+        $contents = str_replace([
+            '{{ valueObjectNamespace }}',
+            '{{ name }}'
+        ], [
+            $valueObjectNamespace,
+            $rawName
+        ], $contents);
 
         $this->createFile($destination, $contents);
+        $this->info("Value Object {$rawName} created at {$destination}.");
 
-        $this->info("Value Object {$rawName} has been successfully created.");
         return 0;
     }
 
-    /**
-     * Create or replace a file with given contents, respecting --force.
-     *
-     * @param string $destination
-     * @param string $contents
-     * @return void
-     */
-    protected function createFile($destination, $contents)
+    protected function createFile(string $destination, string $contents): void
     {
         $force = $this->option('force');
-
         if (File::exists($destination) && !$force) {
-            if (!$this->confirm("File {$destination} already exists. Overwrite it?", true)) {
+            if (!$this->confirm("File {$destination} already exists. Overwrite?", true)) {
                 $this->info("Skipped file: {$destination}");
                 return;
             }
         }
 
         File::put($destination, $contents);
-
-        if (File::exists($destination)) {
-            $this->info("Created/Replaced file: {$destination}");
-        } else {
-            $this->info("Created file: {$destination}");
-        }
+        $this->info(File::exists($destination)
+            ? "Created/Replaced file: {$destination}"
+            : "Created file: {$destination}"
+        );
     }
 }

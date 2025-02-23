@@ -1,15 +1,15 @@
 # Change Log
-All notable changes to `laravel-domains` will be documented in this file.
+All notable changes to `aesircloud/laravel-domains` will be documented in this file.
 
-## 0.2.4 - 2025-02-22
-- **FIXED** Incorrect placeholder in model stubs.
-- **FIXED** Aligned the `make:domain` command to create infrastructure repository classes with the correct name. 
+---
 
-## 0.2.3 - 2025-02-22
-- **FIXED** Incorrect placeholder in model stubs.
+## 1.0.0 - 2025-02-23
+- **ENHANCEMENT:** Added `make:subdomain` command to add subdomains to a domain.
+
+## 0.2.2-0.2.5 - 2025-02-22
+- **FIXED** Incorrect placeholders in stubs.
+- **FIXED** Aligned the `make:domain` command to create infrastructure repository classes with the correct name.
 - **FIXED** Missing `domainLower` placeholder in make:domain command.
-
-## 0.2.2 - 2025-02-22
 - **FIXED** Updated the MakeDomainCommand to generate singular class names (e.g., User) while preserving plural table names (e.g., users). This aligns with typical Laravel conventions, ensuring that running php artisan make:domain Users will create a User.php model, but generate a users table in the migration.
 
 ## 0.2.1 - 2025-02-17
