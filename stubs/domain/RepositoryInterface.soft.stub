@@ -10,14 +10,14 @@ interface {{ domain }}RepositoryInterface
     /**
      * Get all non-deleted {{ domain }} entities.
      *
-     * @return Collection<int, Domain{{ domain }}>
+     * @return Collection<int, {{ domain }}>
      */
     public function all(): Collection;
 
     /**
      * Get all {{ domain }} entities, including trashed.
      *
-     * @return Collection<int, Domain{{ domain }}>
+     * @return Collection<int, {{ domain }}>
      */
     public function allWithTrashed(): Collection;
 
@@ -25,52 +25,52 @@ interface {{ domain }}RepositoryInterface
      * Find a {{ domain }} entity by UUID (including trashed) or return null.
      *
      * @param  string  $id
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}|null
      */
-    public function find(string $id): ?Domain{{ domain }};
+    public function find(string $id): ?{{ domain }};
 
     /**
      * Find a {{ domain }} entity by UUID or fail (including trashed).
      *
      * @param  string  $id
-     * @return Domain{{ domain }}
+     * @return {{ domain }}
      */
-    public function findOrFail(string $id): Domain{{ domain }};
+    public function findOrFail(string $id): {{ domain }};
 
     /**
      * Find a {{ domain }} entity by a given column and value (including trashed) or return null.
      *
      * @param  string  $column
      * @param  mixed   $value
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}|null
      */
-    public function findBy(string $column, mixed $value): ?Domain{{ domain }};
+    public function findBy(string $column, mixed $value): ?{{ domain }};
 
     /**
      * Update an existing record or create a new one if none exists (including trashed).
      *
      * @param  array<string, mixed>  $search
      * @param  array<string, mixed>  $additional
-     * @return Domain{{ domain }}
+     * @return {{ domain }}
      */
-    public function updateOrCreate(array $search, array $additional = []): Domain{{ domain }};
+    public function updateOrCreate(array $search, array $additional = []): {{ domain }};
 
     /**
      * Create a new {{ domain }} entity from given data.
      *
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}
+     * @return {{ domain }}
      */
-    public function create(array $data): Domain{{ domain }};
+    public function create(array $data): {{ domain }};
 
     /**
      * Update an existing {{ domain }} entity by UUID with given data (including trashed).
      *
      * @param  string  $id
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}|null
      */
-    public function update(string $id, array $data): ?Domain{{ domain }};
+    public function update(string $id, array $data): ?{{ domain }};
 
     /**
      * Soft-delete a {{ domain }} entity by UUID.

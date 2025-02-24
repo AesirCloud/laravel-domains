@@ -5,7 +5,7 @@ namespace {{ actionsNamespace }};
 use Lorisleiva\Actions\Concerns\AsAction;
 use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 
-class Restore{{ domain }}Action
+class Restore
 {
     use AsAction;
 

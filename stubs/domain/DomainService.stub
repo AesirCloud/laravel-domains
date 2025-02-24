@@ -4,30 +4,70 @@ namespace {{ domainNamespace }}\DomainServices;
 
 use {{ domainNamespace }}\Repositories\{{ domain }}RepositoryInterface;
 use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
+use {{ domainNamespace }}\Entities\{{ domain }};
 
 class {{ domain }}Service
 {
-    protected {{ domain }}Repository ${{ domainLower }}Repository;
+    protected {{ domain }}RepositoryInterface $repository;
 
-    /**
-     * Inject the repository dependency.
-     *
-     * @param {{ domain }}Repository ${{ domainLower }}Repository
-     */
-    public function __construct({{ domain }}Repository ${{ domainLower }}Repository)
+    public function __construct({{ domain }}RepositoryInterface $repository)
     {
-        $this->{{ domainLower }}Repository = ${{ domainLower }}Repository;
+        $this->repository = $repository;
     }
 
     /**
-     * Execute the primary business operation for the {{ domain }} domain.
-     *
-     * @param mixed $input
-     * @return mixed
+     * Create a new {{ domain }}.
      */
-    public function execute(mixed $input): mixed
+    public function create({{ domain }}Data $dto): {{ domain }}
     {
-        // TODO: Implement business logic for the {{ domain }} domain.
-        // For example, process the $input and return the result.
+        return $this->repository->create($dto->toArray());
+    }
+
+    /**
+     * Update an existing {{ domain }}.
+     */
+    public function update(string $id, {{ domain }}Data $dto): {{ domain }}
+    {
+        return $this->repository->update($id, $dto->toArray());
+    }
+
+    /**
+     * Delete a {{ domain }}.
+     */
+    public function delete(string $id): void
+    {
+        $this->repository->delete($id);
+    }
+
+    /**
+     * Restore a soft-deleted {{ domain }}.
+     */
+    public function restore(string $id): void
+    {
+        $this->repository->restore($id);
+    }
+
+    /**
+     * Force-delete a soft-deleted {{ domain }}.
+     */
+    public function forceDelete(string $id): void
+    {
+        $this->repository->forceDelete($id);
+    }
+
+    /**
+     * Index all
+     */
+    public function index(): array
+    {
+        return $this->repository->all()->all();
+    }
+
+    /**
+     * Show a single entity
+     */
+    public function show(string $id): ?{{ domain }}
+    {
+        return $this->repository->find($id);
     }
 }

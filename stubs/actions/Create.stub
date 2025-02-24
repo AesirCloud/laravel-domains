@@ -7,7 +7,7 @@ use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
 use {{ domainNamespace }}\Entities\{{ domain }};
 
-class Create{{ domain }}Action
+class Create
 {
     use AsAction;
 
@@ -19,13 +19,15 @@ class Create{{ domain }}Action
      */
     public function handle(array $data): {{ domain }}
     {
+        // Validate or transform via DTO
         $dto = {{ domain }}Data::validate($data);
 
+        // Use the domain service to create
         return app({{ domain }}Service::class)->create($dto);
     }
 
     /**
-     * Handle the action as a job.
+     * Handle the action as a job (if you want it queueable).
      *
      * @param  array<string, mixed>  $data
      * @return void

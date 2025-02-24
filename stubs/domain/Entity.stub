@@ -4,30 +4,55 @@ namespace {{ domainNamespace }}\Entities;
 
 class {{ domain }}
 {
-    /**
-     * The unique identifier of the {{ domain }}.
-     */
     protected string $id;
 
-    /**
-     * The name of the {{ domain }}.
-     */
     protected string $name;
 
-    /**
-     * The slug of the {{ domain }}.
-     */
     protected string $slug;
 
     /**
-     * Create a new {{ domain }} entity.
+     * {{ domain }} constructor.
+     *
+     * @param string $id
+     * @param string $name
+     * @param string $slug
      */
     public function __construct(string $id, string $name, string $slug)
     {
         $this->id   = $id;
+
         $this->name = $name;
+
         $this->slug = $slug;
     }
 
-    // Getters, etc.
+    /**
+     * Get the value of id
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get the value of name
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the value of slug
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
 }

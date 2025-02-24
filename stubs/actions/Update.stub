@@ -7,7 +7,7 @@ use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
 use {{ domainNamespace }}\Entities\{{ domain }};
 
-class Update{{ domain }}Action
+class Update
 {
     use AsAction;
 

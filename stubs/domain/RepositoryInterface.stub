@@ -10,7 +10,7 @@ interface {{ domain }}RepositoryInterface
     /**
      * Get all {{ domain }} entities.
      *
-     * @return Collection<int, Domain{{ domain }}>
+     * @return Collection<int, {{ domain }}>
      */
     public function all(): Collection;
 
@@ -18,52 +18,52 @@ interface {{ domain }}RepositoryInterface
      * Find a {{ domain }} entity by UUID or return null.
      *
      * @param  string  $id
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}|null
      */
-    public function find(string $id): ?Domain{{ domain }};
+    public function find(string $id): ?{{ domain }};
 
     /**
      * Find a {{ domain }} entity by UUID or fail.
      *
      * @param  string  $id
-     * @return Domain{{ domain }}
+     * @return {{ domain }}
      */
-    public function findOrFail(string $id): Domain{{ domain }};
+    public function findOrFail(string $id): {{ domain }};
 
     /**
      * Find a {{ domain }} entity by a given column and value or return null.
      *
      * @param  string  $column
      * @param  mixed   $value
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}|null
      */
-    public function findBy(string $column, mixed $value): ?Domain{{ domain }};
+    public function findBy(string $column, mixed $value): ?{{ domain }};
 
     /**
      * Update an existing record or create a new one if none exists.
      *
      * @param  array<string, mixed>  $search
      * @param  array<string, mixed>  $additional
-     * @return Domain{{ domain }}
+     * @return {{ domain }}
      */
-    public function updateOrCreate(array $search, array $additional = []): Domain{{ domain }};
+    public function updateOrCreate(array $search, array $additional = []): {{ domain }};
 
     /**
      * Create a new {{ domain }} entity from given data.
      *
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}
+     * @return {{ domain }}
      */
-    public function create(array $data): Domain{{ domain }};
+    public function create(array $data): {{ domain }};
 
     /**
      * Update an existing {{ domain }} entity by UUID with given data.
      *
      * @param  string  $id
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}|null
      */
-    public function update(string $id, array $data): ?Domain{{ domain }};
+    public function update(string $id, array $data): ?{{ domain }};
 
     /**
      * Delete a {{ domain }} entity by UUID.

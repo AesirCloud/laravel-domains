@@ -2,9 +2,9 @@
 
 namespace App\Infrastructure\Persistence\Repositories;
 
-use App\Domains\{{ domain }}\Repositories\{{ domain }}RepositoryInterface;
-use App\Domains\{{ domain }}\Entities\{{ domain }} as Domain{{ domain }};
-use App\Models\{{ domain }} as Eloquent{{ domain }};
+use {{ domainNamespace }}\Repositories\{{ domain }}RepositoryInterface;
+use {{ domainNamespace }}\Entities\{{ domain }} as {{ domain }}Entity;
+use App\Models\{{ domain }} as {{ domain }};
 use Illuminate\Support\Collection;
 
 class {{ domain }}Repository implements {{ domain }}RepositoryInterface
@@ -12,23 +12,23 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
     /**
      * Return all {{ domain }} entities.
      *
-     * @return Collection<int, Domain{{ domain }}>
+     * @return Collection<int, {{ domain }}Entity}>
      */
     public function all(): Collection
     {
-        return Eloquent{{ domain }}::all()
-            ->map(fn (Eloquent{{ domain }} $model) => $this->toDomain($model));
+        return {{ domain }}::all()
+            ->map(fn ({{ domain }} $model) => $this->toDomain($model));
     }
 
     /**
      * Find a {{ domain }} entity by UUID.
      *
      * @param  string  $id
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}Entity}|null
      */
-    public function find(string $id): ?Domain{{ domain }}
+    public function find(string $id): ?{{ domain }}Entity}
     {
-        $model = Eloquent{{ domain }}::find($id);
+        $model = {{ domain }}::find($id);
 
         return $model ? $this->toDomain($model) : null;
     }
@@ -37,13 +37,13 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
      * Find a {{ domain }} entity by UUID or fail.
      *
      * @param  string  $id
-     * @return Domain{{ domain }}
+     * @return {{ domain }}Entity}
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findOrFail(string $id): Domain{{ domain }}
+    public function findOrFail(string $id): {{ domain }}Entity}
     {
-        $model = Eloquent{{ domain }}::findOrFail($id);
+        $model = {{ domain }}::findOrFail($id);
 
         return $this->toDomain($model);
     }
@@ -53,11 +53,11 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
      *
      * @param  string  $column
      * @param  mixed   $value
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}Entity}|null
      */
-    public function findBy(string $column, mixed $value): ?Domain{{ domain }}
+    public function findBy(string $column, mixed $value): ?{{ domain }}Entity}
     {
-        $model = Eloquent{{ domain }}::where($column, $value)->first();
+        $model = {{ domain }}::where($column, $value)->first();
 
         return $model ? $this->toDomain($model) : null;
     }
@@ -67,11 +67,11 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
      *
      * @param  array<string, mixed>  $search
      * @param  array<string, mixed>  $additional
-     * @return Domain{{ domain }}
+     * @return {{ domain }}Entity}
      */
-    public function updateOrCreate(array $search, array $additional = []): Domain{{ domain }}
+    public function updateOrCreate(array $search, array $additional = []): {{ domain }}Entity}
     {
-        $model = Eloquent{{ domain }}::updateOrCreate($search, $additional);
+        $model = {{ domain }}::updateOrCreate($search, $additional);
 
         return $this->toDomain($model);
     }
@@ -80,11 +80,11 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
      * Create a new {{ domain }} entity from given data.
      *
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}
+     * @return {{ domain }}Entity}
      */
-    public function create(array $data): Domain{{ domain }}
+    public function create(array $data): {{ domain }}Entity}
     {
-        $model = Eloquent{{ domain }}::create($data);
+        $model = {{ domain }}::create($data);
 
         return $this->toDomain($model);
     }
@@ -94,11 +94,11 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
      *
      * @param  string  $id
      * @param  array<string, mixed>  $data
-     * @return Domain{{ domain }}|null
+     * @return {{ domain }}Entity}|null
      */
-    public function update(string $id, array $data): ?Domain{{ domain }}
+    public function update(string $id, array $data): ?{{ domain }}Entity}
     {
-        $model = Eloquent{{ domain }}::find($id);
+        $model = {{ domain }}::find($id);
 
         if (!$model) {
             return null;
@@ -117,7 +117,7 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
      */
     public function delete(string $id): bool
     {
-        $model = Eloquent{{ domain }}::find($id);
+        $model = {{ domain }}::find($id);
 
         if (!$model) {
             return false;
@@ -129,14 +129,14 @@ class {{ domain }}Repository implements {{ domain }}RepositoryInterface
     /**
      * Convert an Eloquent model to a domain entity.
      *
-     * @param  Eloquent{{ domain }}  $model
-     * @return Domain{{ domain }}
+     * @param  {{ domain }}  $model
+     * @return {{ domain }}Entity}
      */
-    protected function toDomain(Eloquent{{ domain }} $model): Domain{{ domain }}
+    protected function toDomain({{ domain }} $model): {{ domain }}Entity}
     {
         // Map Eloquent model fields to domain entity constructor.
         // Adjust as needed for your domain entity's fields.
-        return new Domain{{ domain }}(
+        return new {{ domain }}Entity}(
             $model->id,
             $model->name,
             $model->slug

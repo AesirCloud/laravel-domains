@@ -5,7 +5,7 @@ namespace {{ actionsNamespace }};
 use Lorisleiva\Actions\Concerns\AsAction;
 use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 
-class Delete{{ domain }}Action
+class Delete
 {
     use AsAction;
 
