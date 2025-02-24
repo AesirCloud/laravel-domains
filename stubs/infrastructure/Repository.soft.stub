@@ -2,8 +2,8 @@
 
 namespace App\Infrastructure\Persistence\Repositories;
 
-use App\Domains\{{ domain }}\Repositories\{{ domain }}RepositoryInterface;
-use App\Domains\{{ domain }}\Entities\{{ domain }} as {{ domain }}Entity;
+use {{ domainNamespace }}\Repositories\{{ domain }}RepositoryInterface;
+use {{ domainNamespace }}\Entities\{{ domain }} as {{ domain }}Entity;
 use App\Models\{{ domain }};
 use Illuminate\Support\Collection;
 

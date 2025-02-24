@@ -6,13 +6,12 @@ use Spatie\LaravelData\Data;
 
 class {{ domain }}Data extends Data
 {
-    // Define your properties here. For example:
     public string $name;
 
     public static function rules(): array
     {
         return [
-            'name'  => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ];
     }
 }

@@ -3,8 +3,9 @@ All notable changes to `aesircloud/laravel-domains` will be documented in this f
 
 ---
 
-## 1.0.1 - 2025-02-23
+## 1.0.1-1.0.2 - 2025-02-22 - 2025-02-23
 - **FIXED** Somewhere we messed up the grammatical number of the classes and directories, e.g. singular vs. plural. We've fixed this now.
+- **FIXED** Stubs not having the correct placeholders.
 
 ## 1.0.0 - 2025-02-23
 - **ENHANCEMENT:** Added `make:subdomain` command to add subdomains to a domain.

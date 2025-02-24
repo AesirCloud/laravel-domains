@@ -6,7 +6,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 use {{ domainNamespace }}\Entities\{{ domain }};
 
-class Show{{ domain }}Action
+class Show
 {
     use AsAction;
 

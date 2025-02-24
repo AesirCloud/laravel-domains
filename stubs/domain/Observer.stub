@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Domains\{{ domain }}\Entities\{{ domain }};
+use {{ domainNamespace }}\Entities\{{ domain }};
 
 class {{ domain }}Observer
 {

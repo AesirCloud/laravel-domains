@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Domains\{{ domain }}\Entities\{{ domain }};
+use {{ domainNamespace }}\Entities\{{ domain }};
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class {{ domain }}Policy
