@@ -2,15 +2,13 @@
 
 namespace {{ actionsNamespace }};
 
-use Lorisleiva\Actions\Concerns\AsAction;
+use AesirCloud\LaravelActions\Action;
 use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
 use {{ domainNamespace }}\Entities\{{ domain }};
 
 class Update
 {
-    use AsAction;
-
     /**
      * Handle the action.
      *
@@ -23,17 +21,5 @@ class Update
         $dto = {{ domain }}Data::validate($data);
 
         return app({{ domain }}Service::class)->update($id, $dto);
-    }
-
-    /**
-     * Handle the action as a job.
-     *
-     * @param  string  $id
-     * @param  array<string, mixed>  $data
-     * @return void
-     */
-    public function asJob(string $id, array $data): void
-    {
-        $this->handle($id, $data);
     }
 }

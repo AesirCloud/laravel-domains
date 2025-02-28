@@ -2,10 +2,10 @@
 
 namespace {{ actionsNamespace }};
 
-use Lorisleiva\Actions\Concerns\AsAction;
+use AesirCloud\LaravelActions\Action;
 use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 
-class Restore
+class Restore extends Action
 {
     use AsAction;
 
@@ -18,16 +18,5 @@ class Restore
     public function handle(string $id): void
     {
         app({{ domain }}Service::class)->restore($id);
-    }
-    
-    /**
-     * Handle the action as a job.
-     *
-     * @param  string  $id
-     * @return void
-     */
-    public function asJob(string $id): void
-    {
-        $this->handle($id);
     }
 }
