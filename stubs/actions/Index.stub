@@ -2,14 +2,12 @@
 
 namespace {{ actionsNamespace }};
 
-use Lorisleiva\Actions\Concerns\AsAction;
+use AesirCloud\LaravelActions\Action;
 use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 use {{ domainNamespace }}\Entities\{{ domain }};
 
 class Index
 {
-    use AsAction;
-
     /**
      * Handle the action.
      *

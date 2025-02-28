@@ -38,8 +38,8 @@
     "illuminate/support": "^11.42.1|^12.0",
     "laravel/framework": "^11.42|^12.0",
     "spatie/laravel-data": "^4.13",
-    "lorisleiva/laravel-actions": "^2.8",
-    "aesircloud/sluggable": "^1.1"
+    "aesircloud/sluggable": "^1.1",
+    "aesircloud/laravel-actions": "^1.0"
   },
   "require-dev": {
     "pestphp/pest": "^2.34",

@@ -3,6 +3,9 @@ All notable changes to `aesircloud/laravel-domains` will be documented in this f
 
 ---
 
+## 2.0.0 - 2025-02-28
+- **ENHANCEMENT:** Removed dependency on `lorisleiva/laravel-actions` and replaced with our own `aesircloud/laravel-actions` package.
+
 ## 1.0.1-1.0.3 - 2025-02-22 - 2025-02-23
 - **FIXED** Somewhere we messed up the grammatical number of the classes and directories, e.g. singular vs. plural. We've fixed this now.
 - **FIXED** Stubs not having the correct placeholders.
