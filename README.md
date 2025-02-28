@@ -31,7 +31,7 @@ A Laravel package to scaffold Domain-Driven Design (DDD) structures in your Lara
   Automatically updates your RepositoryServiceProvider with the new domain’s repository binding.
 
 - **CRUD Actions**
-  Generates a full set of CRUD actions (Create, Update, Delete, Index, Show) using `lorisleiva/laravel-actions`.
+  Generates a full set of CRUD actions (Create, Update, Delete, Index, Show) using `aesircloud/laravel-actions`.
 
 - **Optional Soft Delete Actions**
   When the domain uses soft deletes, additional Restore and ForceDelete actions are generated.

@@ -3,8 +3,9 @@ All notable changes to `aesircloud/laravel-domains` will be documented in this f
 
 ---
 
-## 2.0.0 - 2025-02-28
+## 2.0.0-2.0.1 - 2025-02-28
 - **ENHANCEMENT:** Removed dependency on `lorisleiva/laravel-actions` and replaced with our own `aesircloud/laravel-actions` package.
+- **REFACTORED:** Refactored the `Create` and `Update` actions to properly convert the validated data to the correct DTO type before passing it to the domain.
 
 ## 1.0.1-1.0.3 - 2025-02-22 - 2025-02-23
 - **FIXED** Somewhere we messed up the grammatical number of the classes and directories, e.g. singular vs. plural. We've fixed this now.
