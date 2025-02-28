@@ -7,7 +7,7 @@ use {{ domainNamespace }}\DomainServices\{{ domain }}Service;
 use {{ domainNamespace }}\DataTransferObjects\{{ domain }}Data;
 use {{ domainNamespace }}\Entities\{{ domain }};
 
-class Update
+class Update extends Action
 {
     /**
      * Handle the action.
@@ -18,8 +18,9 @@ class Update
      */
     public function handle(string $id, array $data): {{ domain }}
     {
-        $dto = {{ domain }}Data::validate($data);
-
-        return app({{ domain }}Service::class)->update($id, $dto);
+        return app({{ domain }}Service::class)->update(
+            $id,
+            {{ domain }}Data::from({{ domain }}Data::validate($data))
+        );
     }
 }

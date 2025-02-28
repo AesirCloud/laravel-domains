@@ -17,10 +17,8 @@ class Create extends Action
      */
     public function handle(array $data): {{ domain }}
     {
-        // Validate or transform via DTO
-        $dto = {{ domain }}Data::validate($data);
-
-        // Use the domain service to create
-        return app({{ domain }}Service::class)->create($dto);
+        return app({{ domain }}Service::class)->create(
+            {{ domain }}Data::from({{ domain }}Data::validate($data))
+        );
     }
 }
