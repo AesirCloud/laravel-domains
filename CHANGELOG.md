@@ -3,6 +3,10 @@ All notable changes to `aesircloud/laravel-domains` will be documented in this f
 
 ---
 
+## 2.0.2 - 2025-03-02
+- **FIXED:** The observer stubs were incorrectly using the `entity` class rather than the `model` class. This has been fixed.
+- **FIXED:** The DataTransferObject stub was missing the constructor method. This has been added.
+
 ## 2.0.0-2.0.1 - 2025-02-28
 - **ENHANCEMENT:** Removed dependency on `lorisleiva/laravel-actions` and replaced with our own `aesircloud/laravel-actions` package.
 - **REFACTORED:** Refactored the `Create` and `Update` actions to properly convert the validated data to the correct DTO type before passing it to the domain.
