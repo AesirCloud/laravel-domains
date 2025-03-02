@@ -32,6 +32,14 @@ class {{ domain }}Service
     }
 
     /**
+     * Update an existing record or create a new one if none exists (including trashed).
+     */
+    public function updateOrCreate(array $search, array $additional = []): {{ domain }}
+    {
+        return $this->repository->updateOrCreate($search, $additional);
+    }
+
+    /**
      * Delete a {{ domain }}.
      */
     public function delete(string $id): void
