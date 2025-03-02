@@ -8,6 +8,11 @@ class {{ domain }}Data extends Data
 {
     public string $name;
 
+    public function __construct(
+        string $name
+    ){
+    }
+
     public static function rules(): array
     {
         return [
