@@ -24,19 +24,17 @@ class MakeSubdomainCommand extends Command
 
         // For the parent domain
         $parentDirName    = Str::studly($parentRaw);     // "Users"
-        $parentDomain     = Str::singular($parentDirName); // "User"
+        $parentDomain     = Str::singular($parentDirName);// "User"
 
         // For the subdomain
         $subdomainDirName = Str::studly($subdomainRaw);  // "Profiles"
         $subdomainDomain  = Str::singular($subdomainDirName); // "Profile"
         $subdomainLower   = Str::camel($subdomainDomain);     // "profile"
 
-        // e.g. "App\Domains\Users\Profiles"
         $domainNamespace  = "App\\Domains\\{$parentDirName}\\{$subdomainDirName}";
         $actionsNamespace = "App\\Actions\\{$parentDirName}\\{$subdomainDirName}";
 
-        // For DB table => "profiles"
-        $tableName   = Str::snake(Str::plural($subdomainDomain));
+        $tableName   = Str::snake(Str::plural($subdomainDomain)); // "profiles"
         $softDeletes = $this->option('soft-deletes');
         $migration   = $this->option('migration');
         $force       = $this->option('force');
@@ -57,7 +55,7 @@ class MakeSubdomainCommand extends Command
             return 1;
         }
 
-        // 3) Directories inside the subdomain
+        // 3) Directories
         $directories = [
             $baseDir,
             "{$baseDir}/Entities",
@@ -71,29 +69,33 @@ class MakeSubdomainCommand extends Command
 
         // 4) Common placeholders
         $placeholders = [
-            '{{ domainNamespace }}'  => $domainNamespace,  // e.g. "App\Domains\Users\Profiles"
-            '{{ actionsNamespace }}' => $actionsNamespace, // e.g. "App\Actions\Users\Profiles"
+            '{{ domainNamespace }}'  => $domainNamespace,
+            '{{ actionsNamespace }}' => $actionsNamespace,
             '{{ parentDirName }}'    => $parentDirName,
-            '{{ parentDomain }}'     => $parentDomain,     // "User"
-            '{{ subdomainDirName }}' => $subdomainDirName, // "Profiles"
-            '{{ domain }}'           => $subdomainDomain,  // "Profile"
-            '{{ domainLower }}'      => $subdomainLower,   // "profile"
-            '{{ table }}'            => $tableName,        // "profiles"
+            '{{ parentDomain }}'     => $parentDomain,
+            '{{ subdomainDirName }}' => $subdomainDirName,
+            '{{ domain }}'           => $subdomainDomain,
+            '{{ domainLower }}'      => $subdomainLower,
+            '{{ table }}'            => $tableName,
         ];
 
-        // 5) Subdomain stubs path
         $stubPath = __DIR__ . '/../../stubs/domain';
 
-        // If using separate interface stubs for soft deletes:
+        // 5) Pick the correct repository interface stub
         $repoInterfaceStubFile = $softDeletes
             ? 'RepositoryInterface.soft.stub'
             : 'RepositoryInterface.stub';
 
-        // 6) Domain stubs
+        // 6) Pick the correct DomainService stub
+        $domainServiceStub = $softDeletes
+            ? 'DomainService.soft.stub'
+            : 'DomainService.stub';
+
+        // 7) Domain stubs
         $domainStubs = [
             'Entity.stub'                 => "{$baseDir}/Entities/{$subdomainDomain}.php",
             $repoInterfaceStubFile        => "{$baseDir}/Repositories/{$subdomainDomain}RepositoryInterface.php",
-            'DomainService.stub'          => "{$baseDir}/DomainServices/{$subdomainDomain}Service.php",
+            $domainServiceStub            => "{$baseDir}/DomainServices/{$subdomainDomain}Service.php",
         ];
         foreach ($domainStubs as $stub => $dest) {
             DomainCommandHelper::generateStubFile(
@@ -106,7 +108,7 @@ class MakeSubdomainCommand extends Command
             );
         }
 
-        // 7) DTO
+        // 8) DTO
         $dtoStub = "{$stubPath}/DataTransferObject.stub";
         $dtoDest = "{$baseDir}/DataTransferObjects/{$subdomainDomain}Data.php";
         DomainCommandHelper::generateStubFile(
@@ -118,7 +120,7 @@ class MakeSubdomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 8) Model => e.g. "app/Models/Profile.php"
+        // 9) Model
         $modelStubFile = $softDeletes ? 'Model.soft.stub' : 'Model.stub';
         $modelStubPath = __DIR__ . "/../../stubs/model/{$modelStubFile}";
         $modelDest     = app_path("Models/{$subdomainDomain}.php");
@@ -131,7 +133,7 @@ class MakeSubdomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 9) Factory => e.g. "ProfileFactory.php"
+        // 10) Factory
         $factoryStubPath = __DIR__ . "/../../stubs/model/Factory.stub";
         $factoryDest     = database_path("factories/{$subdomainDomain}Factory.php");
         DomainCommandHelper::generateStubFile(
@@ -143,7 +145,7 @@ class MakeSubdomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 10) Observer => "ProfileObserver.php"
+        // 11) Observer
         DomainCommandHelper::createDirectoryIfNotExists(app_path('Observers'), fn($m) => $this->info($m));
         $observerStubFile = $softDeletes ? 'Observer.soft.stub' : 'Observer.stub';
         $observerStubPath = "{$stubPath}/{$observerStubFile}";
@@ -157,7 +159,7 @@ class MakeSubdomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 11) Policy => "ProfilePolicy.php"
+        // 12) Policy
         DomainCommandHelper::createDirectoryIfNotExists(app_path('Policies'), fn($m) => $this->info($m));
         $policyStubFile = $softDeletes ? 'Policy.soft.stub' : 'Policy.stub';
         $policyStubPath = "{$stubPath}/{$policyStubFile}";
@@ -171,7 +173,7 @@ class MakeSubdomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 12) Repo => "ProfileRepository.php"
+        // 13) Concrete repo
         DomainCommandHelper::createDirectoryIfNotExists(
             app_path('Infrastructure/Persistence/Repositories'),
             fn($m) => $this->info($m)
@@ -189,7 +191,7 @@ class MakeSubdomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 13) Migration => e.g. "create_profiles_table.php"
+        // 14) Migration
         if ($migration) {
             $migrationStubFile = $softDeletes ? 'Migration.soft.stub' : 'Migration.stub';
             $migrationStubPath = __DIR__ . "/../../stubs/model/{$migrationStubFile}";
@@ -207,10 +209,10 @@ class MakeSubdomainCommand extends Command
             );
         }
 
-        // 14) Update repository provider
+        // 15) Update subdomain binding in the provider
         $this->updateSubdomainBinding($parentDirName, $subdomainDirName, $subdomainDomain);
 
-        // 15) Create subdomain actions => pass domainNamespace & actionsNamespace
+        // 16) Create subdomain actions
         $this->createSubdomainActions(
             $parentDirName,
             $subdomainDirName,
@@ -241,9 +243,6 @@ class MakeSubdomainCommand extends Command
         );
     }
 
-    /**
-     * We now pass $domainNamespace, $actionsNamespace so placeholders in the action stubs can be replaced.
-     */
     protected function createSubdomainActions(
         string $parentDirName,
         string $subdomainDirName,
@@ -271,12 +270,11 @@ class MakeSubdomainCommand extends Command
             $actionStubs['ForceDelete.stub'] = "ForceDelete.php";
         }
 
-        // Now define placeholders used in the subdomain action stubs
-        // e.g. {{ domainNamespace }}, {{ actionsNamespace }}, {{ domain }}
+        // Action placeholders
         $placeholders = [
             '{{ domainNamespace }}'  => $domainNamespace,
             '{{ actionsNamespace }}' => $actionsNamespace,
-            '{{ domain }}'           => $domain, // e.g. "Profile"
+            '{{ domain }}'           => $domain,
         ];
 
         foreach ($actionStubs as $stub => $fileName) {

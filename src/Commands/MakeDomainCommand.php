@@ -44,7 +44,6 @@ class MakeDomainCommand extends Command
             "{$baseDir}/DataTransferObjects",
         ];
 
-        // Use our helper for each directory
         foreach ($directories as $dir) {
             DomainCommandHelper::createDirectoryIfNotExists($dir, function($msg) {
                 $this->info($msg);
@@ -62,16 +61,21 @@ class MakeDomainCommand extends Command
 
         $stubPath = __DIR__ . '/../../stubs/domain';
 
-        // 3) Condition for the interface stub
+        // 3) Pick the correct repository interface stub
         $repoInterfaceStub = $softDeletes
             ? 'RepositoryInterface.soft.stub'
             : 'RepositoryInterface.stub';
 
-        // 4) Domain stubs
+        // 4) Pick the correct DomainService stub
+        $domainServiceStub = $softDeletes
+            ? 'DomainService.soft.stub'
+            : 'DomainService.stub';
+
+        // 5) Domain stubs
         $domainStubs = [
-            'Entity.stub'         => "{$baseDir}/Entities/{$domain}.php",
-            $repoInterfaceStub    => "{$baseDir}/Repositories/{$domain}RepositoryInterface.php",
-            'DomainService.stub'  => "{$baseDir}/DomainServices/{$domain}Service.php",
+            'Entity.stub'           => "{$baseDir}/Entities/{$domain}.php",
+            $repoInterfaceStub      => "{$baseDir}/Repositories/{$domain}RepositoryInterface.php",
+            $domainServiceStub      => "{$baseDir}/DomainServices/{$domain}Service.php",
         ];
 
         foreach ($domainStubs as $stub => $dest) {
@@ -80,18 +84,16 @@ class MakeDomainCommand extends Command
                 $dest,
                 $placeholders,
                 $force,
-                // logger callback
                 function($msg, $warn=false) {
                     $warn ? $this->warn($msg) : $this->info($msg);
                 },
-                // confirm callback
                 function($question, $default) {
                     return $this->confirm($question, $default);
                 }
             );
         }
 
-        // 5) DTO
+        // 6) DTO
         $dtoStub = "{$stubPath}/DataTransferObject.stub";
         $dtoDest = "{$baseDir}/DataTransferObjects/{$domain}Data.php";
         DomainCommandHelper::generateStubFile(
@@ -100,19 +102,21 @@ class MakeDomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 6) Possibly create BaseModel
+        // 7) Possibly create BaseModel (if it doesn't exist)
         $baseModelPath = app_path('Models/BaseModel.php');
         if (! File::exists($baseModelPath)) {
             $baseModelStub = __DIR__ . '/../../stubs/model/BaseModel.stub';
             DomainCommandHelper::generateStubFile(
-                $baseModelStub, $baseModelPath, [],
+                $baseModelStub,
+                $baseModelPath,
+                [],
                 $force,
                 fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
                 fn($q, $def) => $this->confirm($q, $def)
             );
         }
 
-        // 7) Eloquent model
+        // 8) Eloquent model
         $modelStubFile = $softDeletes ? 'Model.soft.stub' : 'Model.stub';
         $modelDest     = app_path("Models/{$domain}.php");
         DomainCommandHelper::generateStubFile(
@@ -124,7 +128,7 @@ class MakeDomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 8) Factory
+        // 9) Factory
         $factoryStub = __DIR__ . "/../../stubs/model/Factory.stub";
         $factoryDest = database_path("factories/{$domain}Factory.php");
         DomainCommandHelper::generateStubFile(
@@ -134,7 +138,7 @@ class MakeDomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 9) Observer => "app/Observers/UserObserver.php"
+        // 10) Observer
         DomainCommandHelper::createDirectoryIfNotExists(app_path('Observers'), fn($msg) => $this->info($msg));
 
         $observerStubFile = $softDeletes ? 'Observer.soft.stub' : 'Observer.stub';
@@ -149,7 +153,7 @@ class MakeDomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 10) Policy => "app/Policies/UserPolicy.php"
+        // 11) Policy
         DomainCommandHelper::createDirectoryIfNotExists(app_path('Policies'), fn($msg) => $this->info($msg));
 
         $policyStubFile = $softDeletes ? 'Policy.soft.stub' : 'Policy.stub';
@@ -164,7 +168,7 @@ class MakeDomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 11) Concrete repository => "UserRepository.php"
+        // 12) Concrete repository
         DomainCommandHelper::createDirectoryIfNotExists(
             app_path('Infrastructure/Persistence/Repositories'),
             fn($msg) => $this->info($msg)
@@ -183,14 +187,14 @@ class MakeDomainCommand extends Command
             fn($q, $def) => $this->confirm($q, $def)
         );
 
-        // 12) Migration => "create_users_table"
+        // 13) Migration
         if ($migration) {
             $migrationStubFile = $softDeletes ? 'Migration.soft.stub' : 'Migration.stub';
             $migrationStub     = __DIR__ . "/../../stubs/model/{$migrationStubFile}";
 
-            $timestamp    = date('Y_m_d_His');
-            $migrationName= "{$timestamp}_create_{$tableName}_table.php";
-            $migrationDest= database_path("migrations/{$migrationName}");
+            $timestamp     = date('Y_m_d_His');
+            $migrationName = "{$timestamp}_create_{$tableName}_table.php";
+            $migrationDest = database_path("migrations/{$migrationName}");
             DomainCommandHelper::generateStubFile(
                 $migrationStub,
                 $migrationDest,
@@ -201,7 +205,7 @@ class MakeDomainCommand extends Command
             );
         }
 
-        // 13) Update the RepositoryServiceProvider
+        // 14) Update the RepositoryServiceProvider
         $providerPath     = app_path('Providers/RepositoryServiceProvider.php');
         $bindingSignature = "\\App\\Domains\\{$directoryName}\\Repositories\\{$domain}RepositoryInterface::class";
         $bindingLine      = "\n        \$this->app->bind(\n"
@@ -216,7 +220,7 @@ class MakeDomainCommand extends Command
             fn($msg) => $this->info($msg)
         );
 
-        // 14) Create CRUD actions => app/Actions/Users
+        // 15) Create CRUD actions
         $actionsDir = app_path("Actions/{$directoryName}");
         DomainCommandHelper::createDirectoryIfNotExists($actionsDir, fn($m) => $this->info($m));
 

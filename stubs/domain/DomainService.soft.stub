@@ -17,7 +17,7 @@ class {{ domain }}Service
     }
 
     /**
-     * Return all {{ domain }} entities.
+     * Return all non-deleted {{ domain }} entities.
      *
      * @return array<int, {{ domain }}>
      */
@@ -28,7 +28,17 @@ class {{ domain }}Service
     }
 
     /**
-     * Return a single {{ domain }} by UUID or null.
+     * Return all {{ domain }} entities, including trashed.
+     *
+     * @return array<int, {{ domain }}>
+     */
+    public function indexWithTrashed(): array
+    {
+        return $this->repository->allWithTrashed()->all();
+    }
+
+    /**
+     * Return a single {{ domain }} by UUID or null (including trashed).
      */
     public function show(string $id): ?{{ domain }}
     {
@@ -36,7 +46,7 @@ class {{ domain }}Service
     }
 
     /**
-     * Return a single {{ domain }} by UUID or fail.
+     * Return a single {{ domain }} by UUID or fail (including trashed).
      */
     public function findOrFail(string $id): {{ domain }}
     {
@@ -44,7 +54,7 @@ class {{ domain }}Service
     }
 
     /**
-     * Return a single {{ domain }} by a given column and value or null.
+     * Return a single {{ domain }} by a given column and value or null (including trashed).
      */
     public function findBy(string $column, mixed $value): ?{{ domain }}
     {
@@ -60,7 +70,7 @@ class {{ domain }}Service
     }
 
     /**
-     * Update an existing {{ domain }} entity by UUID.
+     * Update an existing {{ domain }} entity by UUID (including trashed).
      */
     public function update(string $id, {{ domain }}Data $dto): ?{{ domain }}
     {
@@ -68,7 +78,7 @@ class {{ domain }}Service
     }
 
     /**
-     * Update an existing record or create a new one if none exists.
+     * Update an existing record or create a new one if none exists (including trashed).
      */
     public function updateOrCreate(array $search, array $additional = []): {{ domain }}
     {
@@ -76,10 +86,26 @@ class {{ domain }}Service
     }
 
     /**
-     * Delete a {{ domain }} entity by UUID.
+     * Soft-delete a {{ domain }} entity by UUID.
      */
     public function delete(string $id): void
     {
         $this->repository->delete($id);
+    }
+
+    /**
+     * Restore a soft-deleted {{ domain }} entity.
+     */
+    public function restore(string $id): void
+    {
+        $this->repository->restore($id);
+    }
+
+    /**
+     * Permanently delete a {{ domain }} entity by UUID (force delete).
+     */
+    public function forceDelete(string $id): void
+    {
+        $this->repository->forceDelete($id);
     }
 }
