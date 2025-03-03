@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         # You can add more PHP versions here if you'd like
-        php: [ '8.3' ]
+        php: [ '8.4' ]
 
     steps:
       - name: Check out code

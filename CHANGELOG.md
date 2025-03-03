@@ -2,6 +2,9 @@
 All notable changes to `aesircloud/laravel-domains` will be documented in this file.
 
 ---
+## 2.0.4 - 2025-03-03
+- **FIXED:** The `DomainService.stub` is missing the findBy method. This has been added.
+- **REFACTORED:** The `DomainService.stub` has been split into two separate files. `DomainService.stub` & `DomainService.soft.stub`. The `MakeDomainCommand` and `MakeSubdomainCommand` files have been updated to reflect this change.
 
 ## 2.0.2-2.0.3 - 2025-03-02
 - **FIXED:** The observer stubs were incorrectly using the `entity` class rather than the `model` class. This has been fixed.
