@@ -48,14 +48,13 @@ class MakeSubdomainCommand extends Command
             return 1;
         }
 
-        // 2) Create the subdomain folder
+        // 2) Create the subdomain folder (or ensure it exists)
         $baseDir = "{$parentDomainPath}/{$subdomainDirName}";
-        if (is_dir($baseDir) && ! $force) {
-            $this->error("Subdomain {$subdomainDirName} already exists. Use --force to overwrite.");
-            return 1;
-        }
+        // We do NOT prematurely block if $baseDir exists. Instead, we will handle
+        // overwrite logic on a file-by-file basis through the stub generator.
+        DomainCommandHelper::createDirectoryIfNotExists($baseDir, fn($msg) => $this->info($msg));
 
-        // 3) Directories
+        // 3) Create subdirectories
         $directories = [
             $baseDir,
             "{$baseDir}/Entities",
@@ -63,6 +62,7 @@ class MakeSubdomainCommand extends Command
             "{$baseDir}/DomainServices",
             "{$baseDir}/DataTransferObjects",
         ];
+
         foreach ($directories as $dir) {
             DomainCommandHelper::createDirectoryIfNotExists($dir, fn($msg) => $this->info($msg));
         }
@@ -93,10 +93,11 @@ class MakeSubdomainCommand extends Command
 
         // 7) Domain stubs
         $domainStubs = [
-            'Entity.stub'                 => "{$baseDir}/Entities/{$subdomainDomain}.php",
-            $repoInterfaceStubFile        => "{$baseDir}/Repositories/{$subdomainDomain}RepositoryInterface.php",
-            $domainServiceStub            => "{$baseDir}/DomainServices/{$subdomainDomain}Service.php",
+            'Entity.stub'          => "{$baseDir}/Entities/{$subdomainDomain}.php",
+            $repoInterfaceStubFile => "{$baseDir}/Repositories/{$subdomainDomain}RepositoryInterface.php",
+            $domainServiceStub     => "{$baseDir}/DomainServices/{$subdomainDomain}Service.php",
         ];
+
         foreach ($domainStubs as $stub => $dest) {
             DomainCommandHelper::generateStubFile(
                 "{$stubPath}/{$stub}",
@@ -225,6 +226,9 @@ class MakeSubdomainCommand extends Command
         return 0;
     }
 
+    /**
+     * Binds the new Subdomain Repository interface to its concrete class
+     */
     protected function updateSubdomainBinding(string $parentDirName, string $subdomainDirName, string $subdomainDomain): void
     {
         $providerPath = app_path('Providers/RepositoryServiceProvider.php');
@@ -243,14 +247,16 @@ class MakeSubdomainCommand extends Command
         );
     }
 
+    /**
+     * Creates CRUD actions (Create, Update, Delete, Index, Show, etc.)
+     */
     protected function createSubdomainActions(
         string $parentDirName,
         string $subdomainDirName,
         string $domain,
         string $domainNamespace,
         string $actionsNamespace
-    ): void
-    {
+    ): void {
         $actionsDir = app_path("Actions/{$parentDirName}/{$subdomainDirName}");
         DomainCommandHelper::createDirectoryIfNotExists($actionsDir, fn($m) => $this->info($m));
 
@@ -266,8 +272,8 @@ class MakeSubdomainCommand extends Command
             'Show.stub'   => 'Show.php',
         ];
         if ($softDeletes) {
-            $actionStubs['Restore.stub']     = "Restore.php";
-            $actionStubs['ForceDelete.stub'] = "ForceDelete.php";
+            $actionStubs['Restore.stub']     = 'Restore.php';
+            $actionStubs['ForceDelete.stub'] = 'ForceDelete.php';
         }
 
         // Action placeholders
