@@ -2,6 +2,10 @@
 All notable changes to `aesircloud/laravel-domains` will be documented in this file.
 
 ---
+## 2.0.6 - 2025-09-06
+- **REFACTORED:** Streamlined domain scaffolding commands by extracting stub callback handling into a shared trait.
+- **REFACTORED:** Tidied the `DomainServiceProvider` for clarity.
+
 ## 2.0.4-2.0.5 - 2025-03-03
 - **FIXED:** The `DomainService.stub` is missing the findBy method. This has been added.
 - **REFACTORED:** The `DomainService.stub` has been split into two separate files. `DomainService.stub` & `DomainService.soft.stub`. The `MakeDomainCommand` and `MakeSubdomainCommand` files have been updated to reflect this change.
