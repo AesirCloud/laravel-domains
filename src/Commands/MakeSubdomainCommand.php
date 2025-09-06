@@ -2,12 +2,15 @@
 
 namespace AesirCloud\LaravelDomains\Commands;
 
+use AesirCloud\LaravelDomains\Commands\Concerns\HandlesStubCallbacks;
 use AesirCloud\LaravelDomains\Helpers\DomainCommandHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 class MakeSubdomainCommand extends Command
 {
+    use HandlesStubCallbacks;
+
     protected $signature = 'make:subdomain
                             {parent : The existing (plural) parent domain, e.g. "Users"}
                             {name : The subdomain (plural) e.g. "Profiles"}
@@ -38,6 +41,9 @@ class MakeSubdomainCommand extends Command
         $softDeletes = $this->option('soft-deletes');
         $migration   = $this->option('migration');
         $force       = $this->option('force');
+
+        $logger  = $this->logger();
+        $confirm = $this->confirmOverwrite();
 
         $this->info("Creating subdomain: {$subdomainDirName} under parent domain: {$parentDirName}");
 
@@ -104,8 +110,8 @@ class MakeSubdomainCommand extends Command
                 $dest,
                 $placeholders,
                 $force,
-                fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-                fn($q, $def) => $this->confirm($q, $def)
+                $logger,
+                $confirm
             );
         }
 
@@ -117,8 +123,8 @@ class MakeSubdomainCommand extends Command
             $dtoDest,
             $placeholders,
             $force,
-            fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-            fn($q, $def) => $this->confirm($q, $def)
+            $logger,
+            $confirm
         );
 
         // 9) Model
@@ -130,8 +136,8 @@ class MakeSubdomainCommand extends Command
             $modelDest,
             $placeholders,
             $force,
-            fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-            fn($q, $def) => $this->confirm($q, $def)
+            $logger,
+            $confirm
         );
 
         // 10) Factory
@@ -142,8 +148,8 @@ class MakeSubdomainCommand extends Command
             $factoryDest,
             $placeholders,
             $force,
-            fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-            fn($q, $def) => $this->confirm($q, $def)
+            $logger,
+            $confirm
         );
 
         // 11) Observer
@@ -156,8 +162,8 @@ class MakeSubdomainCommand extends Command
             $observerDest,
             $placeholders,
             $force,
-            fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-            fn($q, $def) => $this->confirm($q, $def)
+            $logger,
+            $confirm
         );
 
         // 12) Policy
@@ -170,8 +176,8 @@ class MakeSubdomainCommand extends Command
             $policyDest,
             $placeholders,
             $force,
-            fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-            fn($q, $def) => $this->confirm($q, $def)
+            $logger,
+            $confirm
         );
 
         // 13) Concrete repo
@@ -188,8 +194,8 @@ class MakeSubdomainCommand extends Command
             $repoDest,
             $placeholders,
             $force,
-            fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-            fn($q, $def) => $this->confirm($q, $def)
+            $logger,
+            $confirm
         );
 
         // 14) Migration
@@ -205,8 +211,8 @@ class MakeSubdomainCommand extends Command
                 $migrationDest,
                 $placeholders,
                 $force,
-                fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-                fn($q, $def) => $this->confirm($q, $def)
+                $logger,
+                $confirm
             );
         }
 
@@ -219,7 +225,9 @@ class MakeSubdomainCommand extends Command
             $subdomainDirName,
             $subdomainDomain,
             $domainNamespace,
-            $actionsNamespace
+            $actionsNamespace,
+            $logger,
+            $confirm
         );
 
         $this->info("Subdomain {$subdomainDirName} has been successfully created under parent domain {$parentDirName}.");
@@ -255,10 +263,12 @@ class MakeSubdomainCommand extends Command
         string $subdomainDirName,
         string $domain,
         string $domainNamespace,
-        string $actionsNamespace
+        string $actionsNamespace,
+        callable $logger,
+        callable $confirm
     ): void {
         $actionsDir = app_path("Actions/{$parentDirName}/{$subdomainDirName}");
-        DomainCommandHelper::createDirectoryIfNotExists($actionsDir, fn($m) => $this->info($m));
+        DomainCommandHelper::createDirectoryIfNotExists($actionsDir, fn($m) => $logger($m));
 
         $softDeletes = $this->option('soft-deletes');
         $force       = $this->option('force');
@@ -276,7 +286,6 @@ class MakeSubdomainCommand extends Command
             $actionStubs['ForceDelete.stub'] = 'ForceDelete.php';
         }
 
-        // Action placeholders
         $placeholders = [
             '{{ domainNamespace }}'  => $domainNamespace,
             '{{ actionsNamespace }}' => $actionsNamespace,
@@ -289,8 +298,8 @@ class MakeSubdomainCommand extends Command
                 "{$actionsDir}/{$fileName}",
                 $placeholders,
                 $force,
-                fn($msg, $warn=false) => $warn ? $this->warn($msg) : $this->info($msg),
-                fn($q, $def) => $this->confirm($q, $def)
+                $logger,
+                $confirm
             );
         }
     }

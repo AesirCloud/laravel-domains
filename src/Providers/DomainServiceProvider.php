@@ -9,11 +9,6 @@ use Illuminate\Support\ServiceProvider;
 
 class DomainServiceProvider extends ServiceProvider
 {
-    public function register()
-    {
-        //
-    }
-
     public function boot()
     {
         if ($this->app->runningInConsole()) {

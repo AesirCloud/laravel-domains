@@ -57,22 +57,21 @@ class DomainCommandHelper
             $contents = str_replace($search, $replace, $contents);
         }
 
-        // Create or overwrite the file
-        if (File::exists($destination) && ! $forceOverwrite) {
-            // If user does not confirm, skip
+        $existed = File::exists($destination);
+        if ($existed && ! $forceOverwrite) {
             if (! $confirmCallback("File {$destination} already exists. Overwrite it?", true)) {
                 $logger("Skipped file: {$destination}");
                 return;
             }
         }
 
-        File::put($destination, $contents);
-
-        if (File::exists($destination)) {
-            $logger("Created/Replaced file: {$destination}");
-        } else {
-            $logger("Created file: {$destination}");
+        $result = File::put($destination, $contents);
+        if ($result === false) {
+            $logger("Failed to write file: {$destination}", true);
+            return;
         }
+
+        $logger(($existed ? 'Replaced' : 'Created') . " file: {$destination}");
     }
 
     /**
