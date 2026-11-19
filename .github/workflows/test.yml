@@ -14,8 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        # You can add more PHP versions here if you'd like
-        php: [ '8.4' ]
+        php: ['8.4', '8.6']
 
     steps:
       - name: Check out code
@@ -24,11 +23,11 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           coverage: xdebug
 
       - name: Install composer dependencies
-        run: composer install --no-progress --no-interaction --prefer-dist
+        run: composer update --no-progress --no-interaction --prefer-dist --with-all-dependencies
 
       - name: Run tests (Pest)
         run: |
