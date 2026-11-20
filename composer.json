@@ -34,16 +34,16 @@
   },
   "require": {
     "php": "^8.3",
-    "illuminate/console": "^11.42|^12.0",
-    "illuminate/support": "^11.42.1|^12.0",
-    "laravel/framework": "^11.42|^12.0",
+    "illuminate/console": "^11.42|^12.0|^13.0",
+    "illuminate/support": "^11.42.1|^12.0|^13.0",
+    "laravel/framework": "^11.42|^12.0|^13.0",
     "spatie/laravel-data": "^4.13",
     "aesircloud/sluggable": "^1.1",
     "aesircloud/laravel-actions": "^1.0"
   },
   "require-dev": {
-    "pestphp/pest": "^2.34",
-    "orchestra/testbench": "^9.10"
+    "pestphp/pest": "^2.34 || ^3.0 || ^4.0 || ^5.3",
+    "orchestra/testbench": "^9.10 || ^10.0 || ^11.0"
   },
   "config": {
     "allow-plugins": {
