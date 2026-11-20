@@ -2,6 +2,11 @@
 All notable changes to `aesircloud/laravel-domains` will be documented in this file.
 
 ---
+## 2.0.7 - 2026-11-20
+
+- Add Laravel 13 and PHP 8.6 matrix coverage while retaining declared earlier framework branches.
+- Correct the workflow PHP matrix variable and refresh compatible test tools.
+
 ## 2.0.6 - 2025-09-06
 - **REFACTORED:** Streamlined domain scaffolding commands by extracting stub callback handling into a shared trait.
 - **REFACTORED:** Tidied the `DomainServiceProvider` for clarity.
