@@ -1,4 +1,4 @@
-Domains 3 requires Laravel 13 and PHP 8.5+, including PHP 8.6. Domains 2 remains the previous framework support line.
+Domains 3 requires Laravel 13 and PHP 8.3+, including PHP 8.6. Domains 2 remains the previous framework support line.
 
 # aesircloud/laravel-domains
 
@@ -185,13 +185,13 @@ php artisan make:value-object Address --force
 
 ## REQUIREMENTS
 
-- PHP: 8.5 or higher
+- PHP: 8.3 or higher
 - Laravel: ^13.30
 - illuminate/console: ^13.30
 - illuminate/support: ^13.30
 - spatie/laravel-data: 4.13 or higher
-- aesircloud/sluggable: ^1.2.1
-- aesircloud/laravel-actions: ^1.2.1
+- aesircloud/sluggable: ^1.3
+- aesircloud/laravel-actions: ^1.3
 
 ## DESIGN AND DEVELOPMENT STANDARDS
 
