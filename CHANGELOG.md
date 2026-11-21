@@ -2,6 +2,12 @@
 All notable changes to `aesircloud/laravel-domains` will be documented in this file.
 
 ---
+## 3.0.0 - 2026-11-21
+
+- Breaking: require Laravel 13 and PHP 8.5, required by the maintained Laravel Actions branch. Older Laravel installations remain on Domains 2.
+- Remove legacy framework resolution branches that cannot pass current security checks; retain required PHP 8.5 and 8.6 test coverage.
+- Require the verified Laravel Actions 1.2.1 and Sluggable 1.2.1 releases and verify fresh resolution plus locked installation.
+
 ## 2.0.7 - 2026-11-20
 
 - Add Laravel 13 and PHP 8.6 matrix coverage while retaining declared earlier framework branches.
