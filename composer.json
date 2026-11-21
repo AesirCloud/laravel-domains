@@ -9,15 +9,15 @@
     "laravel domains"
   ],
   "type": "library",
-    "license": "MIT",
-    "authors": [
-      {
-        "name": "Greg Upton",
-        "email": "greg@aesircloud.com",
-        "homepage": "https://aesircloud.com",
-        "role": "Developer"
-      }
-    ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Greg Upton",
+      "email": "greg@aesircloud.com",
+      "homepage": "https://aesircloud.com",
+      "role": "Developer"
+    }
+  ],
   "homepage": "https://github.com/AesirCloud/laravel-domains",
   "autoload": {
     "psr-4": {
@@ -34,16 +34,16 @@
   },
   "require": {
     "php": "^8.3",
-    "illuminate/console": "^11.42|^12.0|^13.0",
-    "illuminate/support": "^11.42.1|^12.0|^13.0",
-    "laravel/framework": "^11.42|^12.0|^13.0",
+    "illuminate/console": "^13.30",
+    "illuminate/support": "^13.30",
+    "laravel/framework": "^13.30",
     "spatie/laravel-data": "^4.13",
-    "aesircloud/sluggable": "^1.1",
-    "aesircloud/laravel-actions": "^1.0"
+    "aesircloud/sluggable": "^1.3",
+    "aesircloud/laravel-actions": "^1.3"
   },
   "require-dev": {
-    "pestphp/pest": "^2.34 || ^3.0 || ^4.0 || ^5.3",
-    "orchestra/testbench": "^9.10 || ^10.0 || ^11.0"
+    "pestphp/pest": "^4.0 || ^5.3",
+    "orchestra/testbench": "^11.0"
   },
   "config": {
     "allow-plugins": {

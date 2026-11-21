@@ -4,9 +4,14 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '[0-9]*.[0-9]*.[0-9]*'
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: read
 
 jobs:
   laravel-tests:
@@ -14,11 +19,11 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.4', '8.6']
+        php: ['8.3', '8.4', '8.5', '8.6']
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -29,6 +34,43 @@ jobs:
       - name: Install composer dependencies
         run: composer update --no-progress --no-interaction --prefer-dist --with-all-dependencies
 
+      - run: composer install --prefer-dist --no-interaction --no-progress
+      - run: composer validate --strict
+      - run: composer check-platform-reqs
+      - run: composer audit --locked
+
       - name: Run tests (Pest)
         run: |
           ./vendor/bin/pest
+
+  release:
+    needs: laravel-tests
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare dated release notes
+        run: |
+          python3 - <<'PYRELEASE'
+          import datetime
+          import os
+          import pathlib
+          import re
+
+          version = os.environ['GITHUB_REF_NAME']
+          stable = r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)'
+          if re.fullmatch(stable, version) is None:
+              raise SystemExit('A stable unprefixed version tag is required.')
+          changelog = pathlib.Path('CHANGELOG.md').read_text()
+          matches = list(re.finditer(rf'^## {re.escape(version)} - (\d{{4}}-\d{{2}}-\d{{2}})\r?\n(.*?)(?=^## |\Z)', changelog, re.M | re.S))
+          if len(matches) != 1 or not matches[0].group(2).strip():
+              raise SystemExit('A dated changelog entry is required for this exact release.')
+          datetime.date.fromisoformat(matches[0].group(1))
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'release-notes.md').write_text(matches[0].group(2).strip() + '\n')
+          PYRELEASE
+      - name: Publish verified stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes.md" --latest
